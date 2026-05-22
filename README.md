@@ -1,63 +1,34 @@
 # Endpoint Identity Control Plane
 
-A portfolio-grade FastAPI lab for endpoint and identity risk scoring using synthetic data.
+A local FastAPI lab that models endpoint and identity risk using synthetic Windows/identity inventory data.
 
-**Status:** Local/demo portfolio project. Uses fake data only; not connected to real Microsoft tenants, Active Directory, SCCM/MECM, Intune, Entra ID, or Defender.
+**Status:** Portfolio/demo project for local review. It uses fake data only and does not connect to real Microsoft tenants, Active Directory, SCCM/MECM, Intune, Entra ID, Defender, or employer systems.
 
-## Why this project exists
+## Overview
 
-Endpoint Identity Control Plane is designed as a practical bridge from entry-level IT work into endpoint administration, identity administration, and endpoint/identity security engineering.
+Endpoint Identity Control Plane is designed as a practical bridge from entry-level IT work into endpoint administration, identity administration, and endpoint security. It models common review questions from Microsoft-centered IT environments without requiring a live domain, real tenant, or virtual machine lab.
 
-The project models the kinds of operational questions that appear in Microsoft-centered environments:
+The current backend loads committed synthetic inventory, validates it with Pydantic models, evaluates deterministic endpoint/identity risk rules, and exposes the results through a small FastAPI API. The goal is to show clean engineering and realistic operational reasoning, not to imitate enterprise tooling or process real company data.
 
-- Which endpoints are stale, noncompliant, or missing important security controls?
-- Which users or groups create identity hygiene risk?
-- Which device/user combinations should an IT or security team review first?
-- What remediation steps should be prioritized?
+The data classification for all committed examples and API responses is:
 
-All examples use synthetic demo data so the project can be safely reviewed, tested, and eventually published.
+```text
+synthetic-demo-data-only
+```
 
 ## What it demonstrates
 
-- Endpoint inventory and lifecycle concepts.
-- Identity hygiene and privileged-account review concepts.
-- Deterministic risk scoring with evidence and remediation guidance.
-- FastAPI service design with tests, type checking, linting, security scans, and CI.
-- Public-project discipline: threat model, ADRs, runbooks, docs, and release gates.
-
-## Current capabilities
-
-Implemented now:
-
-- FastAPI application scaffold.
-- `GET /health` service health check.
-- Local validation gates inherited from the secure Python service template.
-
-Planned MVP capabilities:
-
-- `GET /version` project metadata endpoint.
-- Synthetic users, devices, and groups.
-- Endpoint and identity risk findings.
-- Prioritized risk report.
-- Runbooks for common endpoint/identity review workflows.
-
-## Safety boundaries
-
-This project must not include:
-
-- employer data;
-- real user, device, hostname, group, or tenant exports;
-- real Active Directory, SCCM/MECM, Intune, Entra ID, Defender, or Microsoft Graph data;
-- secrets, API keys, credentials, or private screenshots;
-- claims that the project is production-ready.
-
-The intended data classification is:
-
-> `synthetic-demo-data-only`
+- Endpoint inventory concepts: hostname, OS baseline, patch status, encryption, local admin exposure, compliance state, imaging state, and check-in freshness.
+- Identity concepts: users, groups, privileged-group membership, MFA status, disabled accounts, stale logins, and device assignment.
+- Deterministic risk scoring with evidence, severity, category, remediation guidance, and control mappings.
+- FastAPI service design with typed response models and generated OpenAPI docs.
+- Public-safe software discipline: synthetic fixtures, tests, type checking, linting, security scans, ADRs, threat model, and validation checklists.
 
 ## Quick start
 
 ```bash
+git clone <repo-url>
+cd endpoint-identity-control-plane
 python3 -m venv /tmp/endpoint-identity-control-plane-venv
 . /tmp/endpoint-identity-control-plane-venv/bin/activate
 python -m pip install -U pip
@@ -68,34 +39,103 @@ uvicorn endpoint_identity_control_plane.app:app --reload
 
 Open locally:
 
-- API docs: <http://127.0.0.1:8000/docs>
+- Swagger UI: <http://127.0.0.1:8000/docs>
 - ReDoc: <http://127.0.0.1:8000/redoc>
 - Health check: <http://127.0.0.1:8000/health>
+- Risk report: <http://127.0.0.1:8000/risk-report>
 
-## Local container lane
-
-This repository includes a local-only container rehearsal for the FastAPI app. It is intended for private sandbox validation, not production deployment or registry publication.
-
-Build and inspect the image:
+## Example request
 
 ```bash
-docker compose build api
-docker compose config
+curl --silent http://127.0.0.1:8000/risk-report
 ```
 
-Run the API on loopback only:
+Shortened example response:
 
-```bash
-docker compose up -d api
-curl --fail --silent http://127.0.0.1:8000/health
-docker compose exec -T api id
-docker compose down
+```json
+{
+  "generated_at": "2026-05-22T12:00:00Z",
+  "data_classification": "synthetic-demo-data-only",
+  "finding_counts_by_severity": {
+    "high": 9,
+    "medium": 4
+  },
+  "finding_counts_by_category": {
+    "lifecycle": 1,
+    "imaging": 2,
+    "identity": 2,
+    "endpoint": 5,
+    "compliance": 3
+  },
+  "top_risky_assets": [
+    {
+      "asset_type": "device",
+      "asset_id": "device-003",
+      "finding_count": 6,
+      "highest_severity": "high"
+    }
+  ]
+}
 ```
 
-## Development commands
+## Implemented API endpoints
+
+- `GET /health` — local and CI smoke check.
+- `GET /version` — app name, version, and data classification.
+- `GET /users` — synthetic identity records.
+- `GET /devices` — synthetic endpoint records.
+- `GET /groups` — synthetic group records.
+- `GET /findings` — deterministic endpoint and identity findings.
+- `GET /risk-report` — summarized risk report with counts and top risky assets.
+
+See `docs/api.md` for endpoint examples and response notes.
+
+## Current risk rules
+
+The v1 rule engine flags conditions such as:
+
+- privileged user without MFA;
+- disabled user still assigned to a device;
+- stale user login beyond the demo threshold;
+- stale endpoint check-in beyond the demo threshold;
+- Windows 10 treated as an unsupported baseline for the demo timeline;
+- disk encryption disabled;
+- excessive local administrator exposure;
+- noncompliant endpoint state;
+- failed or in-progress imaging state;
+- missing or unknown patch status.
+
+The rule engine is deterministic on purpose. It is easier to test, explain, and review than an ML/LLM-based scoring system for this stage of the project.
+
+## Architecture
+
+At this stage the service is intentionally small:
+
+```text
+API client
+  -> FastAPI route
+  -> synthetic inventory loader
+  -> Pydantic models
+  -> deterministic risk engine
+  -> JSON response
+```
+
+There is no database, authentication layer, live Microsoft integration, or VM dependency in the current MVP.
+
+Deeper docs:
+
+- Architecture: `docs/architecture.md`
+- API: `docs/api.md`
+- Threat model: `docs/threat-model.md`
+- Security posture: `docs/security-posture.md`
+- ADRs: `docs/adr/`
+- Portfolio narrative: `docs/portfolio-narrative.md`
+
+## Validation commands
 
 ```bash
 make lint
+make lint-src-strict
 make format-check
 make typecheck
 make test
@@ -103,34 +143,45 @@ make security
 make all
 ```
 
-`make security` runs advisory local checks. Public release requires the stricter public-release gate and file hygiene review.
+`make all` runs linting, strict source linting, formatting check, mypy, pytest, and advisory security checks. Public release still requires a separate file-hygiene and publication-readiness pass.
 
-## Project roadmap
+## Local container lane
 
-1. **Scaffold hardening and project identity** — rename template artifacts and establish public-safe project purpose.
-2. **Data model and synthetic fixtures** — add validated users, devices, and groups.
-3. **Risk engine MVP** — implement deterministic endpoint and identity hygiene checks.
-4. **API endpoints** — expose inventory, findings, and risk-report endpoints.
-5. **Documentation foundation** — add architecture, threat model, ADRs, runbooks, and portfolio narrative.
-6. **Public-readiness pass** — file hygiene audit, diagram rendering, final docs review, and scan finding classification.
+This repository includes a local-only container rehearsal for the FastAPI app. It is intended for private sandbox validation, not production deployment or registry publication.
 
-Dashboard and live demo deployment are intentionally deferred until the working local system is complete and validated.
+```bash
+docker compose build api
+docker compose config
+docker compose up -d api
+curl --fail --silent http://127.0.0.1:8000/health
+docker compose down
+```
 
-## Documentation
+## Roadmap
 
-Key docs and planning artifacts:
+Completed:
 
-- Design spec: `.hermes/plans/2026-05-22-endpoint-identity-control-plane-design-spec.md`
-- Development guide: `AGENTS.md`
-- Security policy: `SECURITY.md`
-- Architecture docs: `docs/architecture.md`
-- Threat model: `docs/threat-model.md`
-- Security posture: `docs/security-posture.md`
-- ADRs: `docs/adr/`
+1. Scaffold hardening and project identity.
+2. Synthetic data models and fixture loader.
+3. Deterministic endpoint/identity risk engine.
+4. Inventory, findings, and risk-report API endpoints.
+5. Public documentation foundation.
 
-## Honest limitations
+Next:
 
-- This is not connected to a real Microsoft tenant.
-- Findings are simplified and rule-based.
-- The project is not a replacement for Microsoft Defender, Intune, Entra ID, SCCM/MECM, SIEM, or vulnerability management tooling.
-- The first public version is intended to demonstrate engineering discipline and endpoint/identity security reasoning, not enterprise production readiness.
+6. Public-readiness/file hygiene pass.
+7. Optional dashboard or static UI.
+8. Optional live demo deployment after the local system and docs are stable.
+
+## Scope and limitations
+
+- This is not connected to a real Microsoft tenant, domain, SCCM/MECM site, Intune tenant, Entra ID tenant, Defender portal, SIEM, or vulnerability scanner.
+- This project does not require virtual machines for the main demo.
+- The inventory is committed synthetic JSON, not an import from a live system.
+- The risk rules are simplified and deterministic.
+- There is no authentication, persistence, multi-tenant model, or production deployment in the current MVP.
+- The project is not a replacement for Microsoft Defender, Intune, Entra ID, SCCM/MECM, SIEM, asset management, or vulnerability management tooling.
+
+## Data safety
+
+Do not add real employer, tenant, user, device, hostname, group, screenshot, credential, log, or export data. Use only synthetic examples that are safe for public review.

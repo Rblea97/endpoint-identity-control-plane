@@ -1,17 +1,47 @@
 erDiagram
-    RESOURCE {
-        uuid id
-        string status
-        datetime created_at
-        datetime updated_at
+    INVENTORY ||--o{ USER : contains
+    INVENTORY ||--o{ DEVICE : contains
+    INVENTORY ||--o{ GROUP : contains
+    USER ||--o{ DEVICE : assigned
+    GROUP }o--o{ USER : members
+    DEVICE ||--o{ FINDING : produces
+    USER ||--o{ FINDING : produces
+
+    INVENTORY {
+        string data_classification
+        string source
     }
 
-    AUDIT_EVENT {
-        uuid id
-        uuid resource_id
-        string action
-        json metadata
-        datetime created_at
+    USER {
+        string id
+        string username
+        boolean enabled
+        datetime last_login_at
+        boolean mfa_enabled
     }
 
-    RESOURCE ||--o{ AUDIT_EVENT : records
+    DEVICE {
+        string id
+        string hostname
+        string os_name
+        datetime last_checkin_at
+        string patch_status
+        boolean encryption_enabled
+        int local_admin_count
+        string compliance_state
+        string imaging_state
+    }
+
+    GROUP {
+        string id
+        string name
+        string privilege_level
+    }
+
+    FINDING {
+        string id
+        string severity
+        string category
+        string asset_type
+        string asset_id
+    }

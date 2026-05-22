@@ -1,7 +1,18 @@
 flowchart LR
-    Client[API Client] -->|HTTPS JSON| API[FastAPI Service]
-    API --> Validation[Pydantic Validation]
-    API --> Service[Service Layer]
-    Service --> Domain[Domain Logic]
-    API --> Logs[Structured Logs]
-    API --> Docs[OpenAPI Docs]
+    Reviewer[Reviewer or local API client]
+    API[FastAPI app]
+    Loader[Synthetic inventory loader]
+    Fixture[Demo inventory JSON]
+    Models[Pydantic models]
+    Risk[Deterministic risk engine]
+    Docs[Generated OpenAPI docs]
+
+    Reviewer -->|GET /users /devices /groups| API
+    Reviewer -->|GET /findings /risk-report| API
+    API --> Loader
+    Loader --> Fixture
+    Loader --> Models
+    API --> Risk
+    Risk --> API
+    API --> Docs
+    API -->|JSON response| Reviewer

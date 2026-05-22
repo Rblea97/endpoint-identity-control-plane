@@ -1,20 +1,15 @@
 sequenceDiagram
-    participant Client
-    participant API as FastAPI Service
-    participant Validator as Pydantic Validation
-    participant Service as Service Layer
-    participant Logs as Structured Logs
+    participant Client as Local API client
+    participant API as FastAPI route
+    participant Loader as Demo inventory loader
+    participant Models as Pydantic models
+    participant Risk as Risk engine
 
-    Client->>API: HTTP request
-    API->>Validator: Validate request body/query/path
-    alt Valid request
-        Validator-->>API: Typed model
-        API->>Service: Execute use case
-        Service-->>API: Response model
-        API->>Logs: Safe request metadata
-        API-->>Client: Success response
-    else Invalid request
-        Validator-->>API: Validation error
-        API->>Logs: Safe error metadata
-        API-->>Client: Generic validation response
-    end
+    Client->>API: GET /risk-report
+    API->>Loader: load_demo_inventory()
+    Loader->>Models: validate fixture and relationships
+    Models-->>Loader: Inventory
+    Loader-->>API: Validated synthetic inventory
+    API->>Risk: build_risk_report(inventory, as_of)
+    Risk-->>API: RiskReport
+    API-->>Client: JSON response
