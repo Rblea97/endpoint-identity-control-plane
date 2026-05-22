@@ -1,0 +1,10 @@
+# CODEOWNERS template. Replace @Rblea97 with the final owner/team if needed.
+
+.github/workflows/ @Rblea97
+.github/dependabot.yml @Rblea97
+.github/CODEOWNERS @Rblea97
+SECURITY.md @Rblea97
+docs/security-posture.md @Rblea97
+docs/threat-model.md @Rblea97
+docs/change-management.md @Rblea97
+docs/publication-runbook.md @Rblea97

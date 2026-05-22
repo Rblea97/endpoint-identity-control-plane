@@ -1,0 +1,45 @@
+# Hermes publication policy for this repository.
+# Edit per project before making the repo public or portfolio-facing.
+
+visibility_intent: public-portfolio # public-portfolio | private-lab | private-work
+primary_audience: recruiter-hiring-manager
+skim_time_seconds: 30-60
+
+allowed_public_content:
+  - source code written for this portfolio/lab project
+  - sanitized sample data
+  - screenshots with no secrets, private IPs, account IDs, tokens, employer data, or personal data
+  - architecture diagrams that use lab-safe placeholders
+  - documentation describing defensive/security-learning goals
+  - reproducible local/demo setup instructions
+  - AGENTS.md when sanitized and limited to setup, commands, conventions, safety rules, and done criteria
+  - selected .hermes checklists/templates/policies when they are generic, sanitized, and useful to reviewers
+  - polished .hermes plans only when they explain project design without raw prompts, transcripts, or private process notes
+
+blocked_public_content:
+  - secrets, tokens, passwords, private keys, cookies, session files
+  - .env files or copied environment configs with real values
+  - cloud account IDs, ARNs, tenant IDs, subscription IDs, or billing data unless deliberately sanitized
+  - employer/customer/internal system details
+  - raw AI chat transcripts, prompt scratchpads, failed prompt attempts, or private planning notes
+  - exploit instructions against real third-party targets
+  - logs containing usernames, IPs, hostnames, emails, ticket data, or personal data unless sanitized
+  - generated scan reports, SARIF files, SBOMs, local validation logs, caches, virtualenvs, egg-info, coverage HTML, or build artifacts unless intentionally reviewed for publication
+
+portfolio_readme_required:
+  - problem_statement
+  - who_it_is_for
+  - tech_stack
+  - security_focus
+  - quick_start_or_demo
+  - validation_evidence
+  - screenshots_or_architecture_if_useful
+  - limitations_or_safe_lab_scope
+
+release_gate:
+  require_human_review_before_public_push: true
+  block_direct_push_to_public_main: true
+  require_secret_scan: true
+  require_dependency_scan: true
+  require_static_analysis: true
+  require_docs_no_stale_claims: true

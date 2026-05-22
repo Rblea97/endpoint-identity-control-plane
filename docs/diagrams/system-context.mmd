@@ -1,0 +1,7 @@
+flowchart LR
+    Client[API Client] -->|HTTPS JSON| API[FastAPI Service]
+    API --> Validation[Pydantic Validation]
+    API --> Service[Service Layer]
+    Service --> Domain[Domain Logic]
+    API --> Logs[Structured Logs]
+    API --> Docs[OpenAPI Docs]

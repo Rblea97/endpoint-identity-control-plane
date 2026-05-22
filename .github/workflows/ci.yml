@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Python validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: make install-dev
+
+      - name: Lint
+        run: make lint
+
+      - name: Strict source lint
+        run: make lint-src-strict
+
+      - name: Format check
+        run: make format-check
+
+      - name: Typecheck
+        run: make typecheck
+
+      - name: Tests
+        run: make test
+
+      - name: Security scan advisory
+        run: make security-advisory
+
+  workflow-lint:
+    name: GitHub Actions lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install actionlint
+        run: go install github.com/rhysd/actionlint/cmd/actionlint@latest
+
+      - name: Run actionlint
+        run: '"$(go env GOPATH)/bin/actionlint" .github/workflows/*.yml'

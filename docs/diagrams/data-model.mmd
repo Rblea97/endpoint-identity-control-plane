@@ -1,0 +1,17 @@
+erDiagram
+    RESOURCE {
+        uuid id
+        string status
+        datetime created_at
+        datetime updated_at
+    }
+
+    AUDIT_EVENT {
+        uuid id
+        uuid resource_id
+        string action
+        json metadata
+        datetime created_at
+    }
+
+    RESOURCE ||--o{ AUDIT_EVENT : records

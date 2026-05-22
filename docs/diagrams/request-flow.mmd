@@ -1,0 +1,20 @@
+sequenceDiagram
+    participant Client
+    participant API as FastAPI Service
+    participant Validator as Pydantic Validation
+    participant Service as Service Layer
+    participant Logs as Structured Logs
+
+    Client->>API: HTTP request
+    API->>Validator: Validate request body/query/path
+    alt Valid request
+        Validator-->>API: Typed model
+        API->>Service: Execute use case
+        Service-->>API: Response model
+        API->>Logs: Safe request metadata
+        API-->>Client: Success response
+    else Invalid request
+        Validator-->>API: Validation error
+        API->>Logs: Safe error metadata
+        API-->>Client: Generic validation response
+    end
