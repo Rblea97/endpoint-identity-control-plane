@@ -16,26 +16,21 @@ The current MVP has no database, external network integration, authentication la
 
 ## Component diagram
 
-```mermaid
-flowchart LR
-    Client[Local API client or browser]
-    API[FastAPI app]
-    Loader[Synthetic inventory loader]
-    Fixture[Committed demo inventory JSON]
-    Models[Pydantic inventory models]
-    Rules[Deterministic risk engine]
-    Response[JSON API response]
+![System context diagram](diagrams/svg/system-context.svg)
 
-    Client -->|GET requests| API
-    API --> Loader
-    Loader --> Fixture
-    Loader --> Models
-    API --> Rules
-    Rules --> Response
-    API --> Response
-```
+Source: [`system-context.mmd`](diagrams/system-context.mmd). PNG fallback: [`system-context.png`](diagrams/png/system-context.png).
 
-Mermaid sources also live in `docs/diagrams/` for later rendering during the public-readiness lane.
+## Request-flow diagram
+
+![Request flow diagram](diagrams/svg/request-flow.svg)
+
+Source: [`request-flow.mmd`](diagrams/request-flow.mmd). PNG fallback: [`request-flow.png`](diagrams/png/request-flow.png).
+
+## Data-model diagram
+
+![Data model diagram](diagrams/svg/data-model.svg)
+
+Source: [`data-model.mmd`](diagrams/data-model.mmd). PNG fallback: [`data-model.png`](diagrams/png/data-model.png).
 
 ## Request flow
 

@@ -166,10 +166,10 @@ Completed:
 3. Deterministic endpoint/identity risk engine.
 4. Inventory, findings, and risk-report API endpoints.
 5. Public documentation foundation.
+6. Public-readiness/file hygiene pass.
 
 Next:
 
-6. Public-readiness/file hygiene pass.
 7. Optional dashboard or static UI.
 8. Optional live demo deployment after the local system and docs are stable.
 
