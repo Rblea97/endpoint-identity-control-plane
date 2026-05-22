@@ -29,6 +29,9 @@ dev = [
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+endpoint_identity_control_plane = ["data/demo/*.json"]
+
 [tool.ruff]
 line-length = 100
 target-version = "py311"

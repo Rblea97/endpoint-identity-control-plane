@@ -1,0 +1,124 @@
+{
+  "data_classification": "synthetic-demo-data-only",
+  "source": "committed-demo-fixture",
+  "users": [
+    {
+      "id": "user-001",
+      "username": "alex.rivera@example.example",
+      "display_name": "Alex Rivera Demo",
+      "department": "Demo Service Desk",
+      "enabled": true,
+      "last_login_at": "2026-05-18T14:20:00Z",
+      "mfa_enabled": true,
+      "privileged_groups": [],
+      "assigned_device_ids": ["device-001"]
+    },
+    {
+      "id": "user-002",
+      "username": "jamie.chen@example.example",
+      "display_name": "Jamie Chen Demo",
+      "department": "Demo Endpoint Engineering",
+      "enabled": true,
+      "last_login_at": "2026-05-12T09:45:00Z",
+      "mfa_enabled": false,
+      "privileged_groups": ["group-002"],
+      "assigned_device_ids": ["device-002"]
+    },
+    {
+      "id": "user-003",
+      "username": "taylor.morgan@example.example",
+      "display_name": "Taylor Morgan Demo",
+      "department": "Demo Finance",
+      "enabled": false,
+      "last_login_at": "2026-02-01T17:30:00Z",
+      "mfa_enabled": true,
+      "privileged_groups": [],
+      "assigned_device_ids": ["device-003"]
+    },
+    {
+      "id": "user-004",
+      "username": "casey.patel@example.example",
+      "display_name": "Casey Patel Demo",
+      "department": "Demo Identity Operations",
+      "enabled": true,
+      "last_login_at": "2026-05-20T11:05:00Z",
+      "mfa_enabled": true,
+      "privileged_groups": ["group-003"],
+      "assigned_device_ids": ["device-004"]
+    }
+  ],
+  "devices": [
+    {
+      "id": "device-001",
+      "hostname": "DEMO-WIN11-001",
+      "assigned_user_id": "user-001",
+      "os_name": "Windows 11 Enterprise",
+      "os_version": "23H2",
+      "last_checkin_at": "2026-05-21T13:10:00Z",
+      "patch_status": "current",
+      "encryption_enabled": true,
+      "local_admin_count": 1,
+      "compliance_state": "compliant",
+      "imaging_state": "complete"
+    },
+    {
+      "id": "device-002",
+      "hostname": "DEMO-WIN11-002",
+      "assigned_user_id": "user-002",
+      "os_name": "Windows 11 Enterprise",
+      "os_version": "22H2",
+      "last_checkin_at": "2026-05-19T08:55:00Z",
+      "patch_status": "behind",
+      "encryption_enabled": true,
+      "local_admin_count": 4,
+      "compliance_state": "noncompliant",
+      "imaging_state": "complete"
+    },
+    {
+      "id": "device-003",
+      "hostname": "DEMO-WIN10-003",
+      "assigned_user_id": "user-003",
+      "os_name": "Windows 10 Enterprise",
+      "os_version": "22H2",
+      "last_checkin_at": "2026-03-10T16:40:00Z",
+      "patch_status": "missing",
+      "encryption_enabled": false,
+      "local_admin_count": 2,
+      "compliance_state": "unknown",
+      "imaging_state": "failed"
+    },
+    {
+      "id": "device-004",
+      "hostname": "DEMO-WIN11-004",
+      "assigned_user_id": "user-004",
+      "os_name": "Windows 11 Enterprise",
+      "os_version": "23H2",
+      "last_checkin_at": "2026-05-22T07:25:00Z",
+      "patch_status": "unknown",
+      "encryption_enabled": true,
+      "local_admin_count": 1,
+      "compliance_state": "compliant",
+      "imaging_state": "in_progress"
+    }
+  ],
+  "groups": [
+    {
+      "id": "group-001",
+      "name": "Demo Endpoint Readers",
+      "privilege_level": "standard",
+      "member_user_ids": ["user-001", "user-003"]
+    },
+    {
+      "id": "group-002",
+      "name": "Demo Endpoint Administrators",
+      "privilege_level": "admin",
+      "member_user_ids": ["user-002"]
+    },
+    {
+      "id": "group-003",
+      "name": "Demo Identity Break Glass Review",
+      "privilege_level": "tier0",
+      "member_user_ids": ["user-004"]
+    }
+  ]
+}
