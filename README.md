@@ -1,38 +1,59 @@
 # Endpoint Identity Control Plane
 
-<!--
-Before publishing:
-1. Replace the title, one-liner, repository URLs, and examples.
-2. Replace placeholder badges with real GitHub Actions badge links after the repo exists.
-3. Delete this comment block.
--->
+A portfolio-grade FastAPI lab for endpoint and identity risk scoring using synthetic data.
 
-A small FastAPI service template for building secure, testable Python APIs with repeatable CI and security checks.
+**Status:** Local/demo portfolio project. Uses fake data only; not connected to real Microsoft tenants, Active Directory, SCCM/MECM, Intune, Entra ID, or Defender.
 
-**Status:** Portfolio/demo starter. Use fake data only; this scaffold is designed for local review and private hardening before public release.
+## Why this project exists
 
-<!-- Optional once the repo exists:
-[![CI](https://github.com/<owner>/<repo>/actions/workflows/ci.yml/badge.svg)](https://github.com/<owner>/<repo>/actions/workflows/ci.yml)
-![Python](https://img.shields.io/badge/python-3.11%2B-blue)
-![FastAPI](https://img.shields.io/badge/FastAPI-service-green)
-![Security checks](https://img.shields.io/badge/security-gitleaks%20%7C%20bandit%20%7C%20pip--audit-informational)
--->
+Endpoint Identity Control Plane is designed as a practical bridge from entry-level IT work into endpoint administration, identity administration, and endpoint/identity security engineering.
 
-## Overview
+The project models the kinds of operational questions that appear in Microsoft-centered environments:
 
-Endpoint Identity Control Plane is a starter API for practicing production-shaped software development in a safe lab environment. It gives a new project a working FastAPI app, test suite, GitHub Actions workflow, dependency-update configuration, security policy, and reusable Hermes/Codex development artifacts.
+- Which endpoints are stale, noncompliant, or missing important security controls?
+- Which users or groups create identity hygiene risk?
+- Which device/user combinations should an IT or security team review first?
+- What remediation steps should be prioritized?
 
-Use it as the baseline for small portfolio or learning projects where the goal is not just to write code, but to show the full lifecycle: planning, implementation, review, testing, CI, security checks, documentation, and public-release readiness.
-
-The default app is intentionally minimal. Project-specific behavior, architecture decisions, screenshots, and examples should be added before publishing the repository publicly.
+All examples use synthetic demo data so the project can be safely reviewed, tested, and eventually published.
 
 ## What it demonstrates
 
-- FastAPI project structure with a simple health endpoint.
-- Python quality gates with Ruff, mypy, pytest, Bandit, Gitleaks, and pip-audit.
-- GitHub Actions CI with least-privilege permissions and workflow linting.
-- Public-release discipline: README quality, security posture, threat model, branch protection, and publication review.
-- AI-assisted development governance: Codex implements narrow lanes; Hermes reviews, verifies, and preserves reusable lessons; Richie remains final reviewer.
+- Endpoint inventory and lifecycle concepts.
+- Identity hygiene and privileged-account review concepts.
+- Deterministic risk scoring with evidence and remediation guidance.
+- FastAPI service design with tests, type checking, linting, security scans, and CI.
+- Public-project discipline: threat model, ADRs, runbooks, docs, and release gates.
+
+## Current capabilities
+
+Implemented now:
+
+- FastAPI application scaffold.
+- `GET /health` service health check.
+- Local validation gates inherited from the secure Python service template.
+
+Planned MVP capabilities:
+
+- `GET /version` project metadata endpoint.
+- Synthetic users, devices, and groups.
+- Endpoint and identity risk findings.
+- Prioritized risk report.
+- Runbooks for common endpoint/identity review workflows.
+
+## Safety boundaries
+
+This project must not include:
+
+- employer data;
+- real user, device, hostname, group, or tenant exports;
+- real Active Directory, SCCM/MECM, Intune, Entra ID, Defender, or Microsoft Graph data;
+- secrets, API keys, credentials, or private screenshots;
+- claims that the project is production-ready.
+
+The intended data classification is:
+
+> `synthetic-demo-data-only`
 
 ## Quick start
 
@@ -42,15 +63,10 @@ python3 -m venv /tmp/endpoint-identity-control-plane-venv
 python -m pip install -U pip
 python -m pip install -e '.[dev]'
 make all
-```
-
-Run the app locally:
-
-```bash
 uvicorn endpoint_identity_control_plane.app:app --reload
 ```
 
-Open:
+Open locally:
 
 - API docs: <http://127.0.0.1:8000/docs>
 - ReDoc: <http://127.0.0.1:8000/redoc>
@@ -73,121 +89,48 @@ Run the API on loopback only:
 docker compose up -d api
 curl --fail --silent http://127.0.0.1:8000/health
 docker compose exec -T api id
+docker compose down
 ```
 
-Run optional local container checks when the tools are installed:
+## Development commands
 
 ```bash
-hadolint Dockerfile
-dockerfilelint Dockerfile
-trivy fs .
-trivy image endpoint-identity-control-plane-api:local
-syft .
-grype dir:.
-```
-
-Clean up local containers and volumes:
-
-```bash
-docker compose down -v
-```
-
-Safety limitations:
-
-- Examples are fake, local, and private.
-- Compose binds the API to `127.0.0.1:8000` only.
-- The image runtime uses a non-root app user.
-- The container lane does not add cloud deployment, registry push, Kubernetes, production secrets, or real data handling.
-- Passing local container checks does not mean the project is public-release or production ready.
-
-## Example request
-
-```bash
-curl -s http://127.0.0.1:8000/health | python -m json.tool
-```
-
-Example output:
-
-```json
-{
-  "status": "ok"
-}
-```
-
-## Architecture
-
-The starter keeps the first version deliberately small: one FastAPI application module, one health-check test, and a reusable validation contract in the Makefile. As the project grows, add domain modules under `src/`, behavior tests under `tests/`, and architecture decisions under `docs/adr/`.
-
-```mermaid
-flowchart LR
-    User[Local user or API client] --> App[FastAPI app]
-    App --> Route[Health/API routes]
-    Route --> Tests[pytest behavior tests]
-    Repo[Repository] --> CI[GitHub Actions]
-    CI --> Gates[lint, typecheck, tests, security scans]
-```
-
-## Project docs
-
-- [Architecture](docs/architecture.md)
-- [API notes](docs/api.md)
-- [Development workflow](docs/development.md)
-- [Testing and quality gates](docs/testing.md)
-- [Security posture](docs/security-posture.md)
-- [Threat model](docs/threat-model.md)
-- [Publication runbook](docs/publication-runbook.md)
-- [Public repository file policy](docs/public-repo-file-policy.md)
-- [Design decisions](docs/adr/)
-
-## Configuration
-
-Copy `.env.example` only as a placeholder reference. Do not commit real `.env` files.
-
-- `APP_ENV`: local environment label. Default: `development`.
-- `LOG_LEVEL`: application log level. Default: `INFO`.
-
-Update this section when project-specific settings are added.
-
-## Testing and checks
-
-Run the full local gate:
-
-```bash
+make lint
+make format-check
+make typecheck
+make test
+make security
 make all
 ```
 
-Run the stricter pre-publication gate:
+`make security` runs advisory local checks. Public release requires the stricter public-release gate and file hygiene review.
 
-```bash
-make public-release-check
-hermes-publication-gate --repo .
-hermes-sec-scan --repo .
-```
+## Project roadmap
 
-The public-release gate should pass before making the repo public, changing visibility, creating a release, publishing a package, or pushing a container image.
+1. **Scaffold hardening and project identity** — rename template artifacts and establish public-safe project purpose.
+2. **Data model and synthetic fixtures** — add validated users, devices, and groups.
+3. **Risk engine MVP** — implement deterministic endpoint and identity hygiene checks.
+4. **API endpoints** — expose inventory, findings, and risk-report endpoints.
+5. **Documentation foundation** — add architecture, threat model, ADRs, runbooks, and portfolio narrative.
+6. **Public-readiness pass** — file hygiene audit, diagram rendering, final docs review, and scan finding classification.
 
-## Public release checklist
+Dashboard and live demo deployment are intentionally deferred until the working local system is complete and validated.
 
-Before publishing:
+## Documentation
 
-- Replace all template names and examples.
-- Add real project behavior and meaningful tests.
-- Replace placeholder badge URLs with real repository badge links.
-- Confirm `.env.example` contains placeholders only.
-- Review `AGENTS.md` and `.hermes/` content for public-safe wording.
-- Remove raw AI scratch work, private retrospectives, generated reports, caches, and local environment files.
-- Run the publication runbook and record validation evidence.
+Key docs and planning artifacts:
 
-For repeatable public-readiness work beyond this Python/FastAPI template, use the stack-neutral baseline pack at:
+- Design spec: `.hermes/plans/2026-05-22-endpoint-identity-control-plane-design-spec.md`
+- Development guide: `AGENTS.md`
+- Security policy: `SECURITY.md`
+- Architecture docs: `docs/architecture.md`
+- Threat model: `docs/threat-model.md`
+- Security posture: `docs/security-posture.md`
+- ADRs: `docs/adr/`
 
-```text
-/root/.hermes/project-templates/public-ready-baseline/
-```
+## Honest limitations
 
-That pack defines the reusable maturity lanes, public-ready checklist, lane-plan template, validation-log template, and cross-stack validation matrix for future Python, TypeScript, Go, Rust, shell, Docker, CI/CD, and IaC projects.
-
-## Scope and limitations
-
-This scaffold is not production software by itself. It does not include authentication, persistence, deployment infrastructure, monitoring, backups, or production incident response. Add those deliberately in separate reviewed lanes when the project needs them.
-
-Use fake data only until a project-specific data handling and publication review has been completed.
+- This is not connected to a real Microsoft tenant.
+- Findings are simplified and rule-based.
+- The project is not a replacement for Microsoft Defender, Intune, Entra ID, SCCM/MECM, SIEM, or vulnerability management tooling.
+- The first public version is intended to demonstrate engineering discipline and endpoint/identity security reasoning, not enterprise production readiness.

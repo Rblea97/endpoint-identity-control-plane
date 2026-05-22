@@ -2,7 +2,9 @@
 
 ## Project purpose
 
-[Replace this with 3-5 sentences describing the project, its users, and what it must not do.]
+Endpoint Identity Control Plane is a public portfolio FastAPI lab for practicing endpoint and identity security operations with synthetic data. It models users, groups, Windows endpoints, compliance state, lifecycle state, and risk findings inspired by SCCM/MECM, Active Directory, Intune, Entra ID, and Defender-style workflows.
+
+The project is intended for local/demo use, hiring-manager review, and technical interview discussion. It must never include employer data, real tenant exports, real Active Directory/SCCM/Intune data, secrets, private screenshots, or production claims that the code does not support.
 
 ## Tech stack
 
