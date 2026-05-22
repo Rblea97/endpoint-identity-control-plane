@@ -20,9 +20,31 @@ synthetic-demo-data-only
 
 - Endpoint inventory concepts: hostname, OS baseline, patch status, encryption, local admin exposure, compliance state, imaging state, and check-in freshness.
 - Identity concepts: users, groups, privileged-group membership, MFA status, disabled accounts, stale logins, and device assignment.
+- Actionable IT triage scenarios for imaging/provisioning, offboarding cleanup, privileged access review, and endpoint compliance prioritization.
 - Deterministic risk scoring with evidence, severity, category, remediation guidance, and control mappings.
 - FastAPI service design with typed response models and generated OpenAPI docs.
 - Public-safe software discipline: synthetic fixtures, tests, type checking, linting, security scans, ADRs, threat model, and validation checklists.
+
+## 5-minute actionable IT demo
+
+This project is meant to be demoed as an endpoint operations lab, not just a code repository. After installation, run:
+
+```bash
+endpoint-identity-demo --list
+endpoint-identity-demo --scenario failed-imaging
+endpoint-identity-demo --scenario disabled-user-device-assignment
+endpoint-identity-demo --scenario privileged-user-missing-mfa
+endpoint-identity-demo --scenario endpoint-compliance-queue
+```
+
+The CLI prints ticket-style walkthroughs with affected assets, findings, technician actions, and verification steps. These scenarios map directly to job-adjacent entry-level IT work:
+
+- imaging/provisioning triage similar to SCCM/MECM task-sequence troubleshooting;
+- disabled-user/device assignment review similar to AD and endpoint lifecycle cleanup;
+- privileged account without MFA review similar to identity administration escalation;
+- endpoint compliance queue prioritization similar to desktop support or endpoint admin remediation planning.
+
+Scenario docs live in `docs/demo-scenarios/`.
 
 ## Quick start
 
@@ -124,6 +146,7 @@ There is no database, authentication layer, live Microsoft integration, or VM de
 
 Deeper docs:
 
+- Demo scenarios: `docs/demo-scenarios/`
 - Architecture: `docs/architecture.md`
 - API: `docs/api.md`
 - Threat model: `docs/threat-model.md`
@@ -168,10 +191,12 @@ Completed:
 5. Public documentation foundation.
 6. Public-readiness/file hygiene pass.
 
+7. Actionable IT operations demo scenarios.
+
 Next:
 
-7. Optional dashboard or static UI.
-8. Optional live demo deployment after the local system and docs are stable.
+8. Optional dashboard or static UI.
+9. Optional live demo deployment after the local system and docs are stable.
 
 ## Scope and limitations
 
