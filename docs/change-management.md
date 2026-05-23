@@ -59,6 +59,7 @@ Rules:
 - Do not add dependencies without approval.
 - Do not use real personal, employer, customer, incident, or secret data.
 - Do not push, publish, release, deploy, or alter cloud resources unless Richie explicitly approves.
+- For webhook/Kanban rehearsals, use docs-only draft PRs and verify capture-only behavior before any automation tier is promoted.
 
 ### 4. Hermes review gate
 
