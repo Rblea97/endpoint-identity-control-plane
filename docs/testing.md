@@ -22,3 +22,5 @@ For every meaningful lane, record exact commands and results using `.hermes/chec
 ## Webhook rehearsal notes
 
 Tiny documentation-only pull requests can be used to rehearse the GitHub webhook and Tier 2 Kanban triage flow. These rehearsals should verify event delivery, Kanban deduplication, and read-only guardrails without changing application behavior or introducing external data.
+
+Post-hardening rehearsals should also confirm capture-only Kanban cards remain scheduled until explicitly approved, so webhook delivery never implies worker dispatch.
