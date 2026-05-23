@@ -18,3 +18,7 @@
 ## Validation evidence
 
 For every meaningful lane, record exact commands and results using `.hermes/checklists/validation-log-template.md`. Public-facing changes should include security/dependency scan classification and CI status before merge or publication.
+
+## Webhook rehearsal notes
+
+Tiny documentation-only pull requests can be used to rehearse the GitHub webhook and Tier 2 Kanban triage flow. These rehearsals should verify event delivery, Kanban deduplication, and read-only guardrails without changing application behavior or introducing external data.
