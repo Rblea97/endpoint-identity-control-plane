@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Clickable synthetic endpoint and identity operations demo for IT triage workflows."
+    />
+    <title>Endpoint Identity Control Plane Demo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="shell hero">
+      <nav class="nav" aria-label="Demo navigation">
+        <div class="brand-mark">EICP</div>
+        <a href="#scenarios">Scenarios</a>
+        <a href="#queue">Endpoint queue</a>
+        <a href="#findings">Findings</a>
+      </nav>
+      <section class="hero-grid">
+        <div>
+          <p class="eyebrow">Synthetic Microsoft-stack IT operations lab</p>
+          <h1>Endpoint Identity Control Plane</h1>
+          <p class="hero-copy">
+            Click through failed imaging, disabled-user cleanup, privileged MFA review, and
+            endpoint compliance triage without needing a real AD, SCCM, Intune, or Entra tenant.
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="#scenarios">Start the demo</a>
+            <a class="button ghost" href="https://github.com/Rblea97/endpoint-identity-control-plane">View repo docs</a>
+          </div>
+        </div>
+        <aside class="status-card" aria-label="Demo status summary">
+          <span class="pill">synthetic-demo-data-only</span>
+          <div class="metric-row">
+            <div><strong id="total-devices">—</strong><span>Devices</span></div>
+            <div><strong id="total-users">—</strong><span>Users</span></div>
+            <div><strong id="total-findings">—</strong><span>Findings</span></div>
+          </div>
+          <p>
+            Built to show technician reasoning: evidence, prioritization, remediation, and ticket
+            verification.
+          </p>
+        </aside>
+      </section>
+    </header>
+
+    <main class="shell">
+      <section class="panel" id="scenarios">
+        <div class="section-heading">
+          <p class="eyebrow">Clickable demo</p>
+          <h2>Choose an IT scenario</h2>
+          <p>
+            Each scenario is a simulated ticket backed by the same synthetic inventory and risk
+            findings used by the FastAPI backend.
+          </p>
+        </div>
+        <div class="scenario-layout">
+          <div class="scenario-list" id="scenario-list" aria-label="Scenario buttons"></div>
+          <article class="scenario-detail" id="scenario-detail" aria-live="polite"></article>
+        </div>
+      </section>
+
+      <section class="panel" id="queue">
+        <div class="section-heading">
+          <p class="eyebrow">Endpoint admin view</p>
+          <h2>Remediation queue</h2>
+          <p>Click a device to inspect ownership, compliance, imaging, patching, and findings.</p>
+        </div>
+        <div class="queue-grid">
+          <div class="device-list" id="device-list"></div>
+          <article class="device-detail" id="device-detail" aria-live="polite"></article>
+        </div>
+      </section>
+
+      <section class="panel" id="findings">
+        <div class="section-heading">
+          <p class="eyebrow">Evidence view</p>
+          <h2>Findings and remediation guidance</h2>
+          <p>Filter by severity to see what the lab flags and how a technician might respond.</p>
+        </div>
+        <div class="filter-bar" id="severity-filters"></div>
+        <div class="findings-grid" id="findings-grid"></div>
+      </section>
+    </main>
+
+    <footer class="shell footer">
+      <p>
+        Demo data is synthetic only. This site does not connect to real Microsoft tenants, AD,
+        SCCM/MECM, Intune, Entra ID, Defender, employer systems, or secrets.
+      </p>
+    </footer>
+
+    <script src="app.js" type="module"></script>
+  </body>
+</html>

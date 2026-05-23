@@ -46,6 +46,21 @@ The CLI prints ticket-style walkthroughs with affected assets, findings, technic
 
 Scenario docs live in `docs/demo-scenarios/`.
 
+## Clickable browser demo
+
+The repository also includes a static browser UI under `site/`. It can run locally now and can be deployed to GitHub Pages after explicit approval.
+
+Local preview:
+
+```bash
+python scripts/export_static_demo.py
+python -m http.server 4173 --directory site
+```
+
+Then open <http://127.0.0.1:4173/>.
+
+The prepared GitHub Pages workflow is manual-only (`workflow_dispatch`) so the site is not deployed just because code is merged. Public deployment should happen only after final review.
+
 ## Quick start
 
 ```bash
