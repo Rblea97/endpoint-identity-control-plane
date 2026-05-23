@@ -1,0 +1,504 @@
+{
+  "app_name": "Endpoint Identity Control Plane",
+  "data_classification": "synthetic-demo-data-only",
+  "devices": [
+    {
+      "assigned_user_id": "user-001",
+      "compliance_state": "compliant",
+      "encryption_enabled": true,
+      "hostname": "DEMO-WIN11-001",
+      "id": "device-001",
+      "imaging_state": "complete",
+      "last_checkin_at": "2026-05-21T13:10:00Z",
+      "local_admin_count": 1,
+      "os_name": "Windows 11 Enterprise",
+      "os_version": "23H2",
+      "patch_status": "current"
+    },
+    {
+      "assigned_user_id": "user-002",
+      "compliance_state": "noncompliant",
+      "encryption_enabled": true,
+      "hostname": "DEMO-WIN11-002",
+      "id": "device-002",
+      "imaging_state": "complete",
+      "last_checkin_at": "2026-05-19T08:55:00Z",
+      "local_admin_count": 4,
+      "os_name": "Windows 11 Enterprise",
+      "os_version": "22H2",
+      "patch_status": "behind"
+    },
+    {
+      "assigned_user_id": "user-003",
+      "compliance_state": "unknown",
+      "encryption_enabled": false,
+      "hostname": "DEMO-WIN10-003",
+      "id": "device-003",
+      "imaging_state": "failed",
+      "last_checkin_at": "2026-03-10T16:40:00Z",
+      "local_admin_count": 2,
+      "os_name": "Windows 10 Enterprise",
+      "os_version": "22H2",
+      "patch_status": "missing"
+    },
+    {
+      "assigned_user_id": "user-004",
+      "compliance_state": "compliant",
+      "encryption_enabled": true,
+      "hostname": "DEMO-WIN11-004",
+      "id": "device-004",
+      "imaging_state": "in_progress",
+      "last_checkin_at": "2026-05-22T07:25:00Z",
+      "local_admin_count": 1,
+      "os_name": "Windows 11 Enterprise",
+      "os_version": "23H2",
+      "patch_status": "unknown"
+    }
+  ],
+  "findings": [
+    {
+      "asset_id": "user-003",
+      "asset_type": "user",
+      "category": "lifecycle",
+      "control_mapping": "Lifecycle hygiene: offboarding and asset ownership",
+      "evidence": {
+        "assigned_device_count": 1,
+        "username": "taylor.morgan@example.example"
+      },
+      "id": "lifecycle-disabled-user-assigned-device-user-003",
+      "recommendation": "Review offboarding and reclaim or reassign the user's devices.",
+      "severity": "high",
+      "title": "Disabled user still has assigned devices"
+    },
+    {
+      "asset_id": "device-003",
+      "asset_type": "device",
+      "category": "imaging",
+      "control_mapping": "Endpoint lifecycle: imaging and provisioning quality",
+      "evidence": {
+        "hostname": "DEMO-WIN10-003",
+        "imaging_state": "failed"
+      },
+      "id": "imaging-incomplete-state-device-003",
+      "recommendation": "Review deployment logs and confirm provisioning completed.",
+      "severity": "high",
+      "title": "Endpoint imaging state requires review"
+    },
+    {
+      "asset_id": "user-002",
+      "asset_type": "user",
+      "category": "identity",
+      "control_mapping": "Identity hygiene: privileged access protection",
+      "evidence": {
+        "mfa_enabled": false,
+        "privileged_group_count": 1,
+        "username": "jamie.chen@example.example"
+      },
+      "id": "identity-privileged-user-missing-mfa-user-002",
+      "recommendation": "Require MFA for privileged endpoint or identity access.",
+      "severity": "high",
+      "title": "Privileged user does not have MFA enabled"
+    },
+    {
+      "asset_id": "device-003",
+      "asset_type": "device",
+      "category": "endpoint",
+      "control_mapping": "Endpoint hygiene: supported operating system baseline",
+      "evidence": {
+        "hostname": "DEMO-WIN10-003",
+        "os_name": "Windows 10 Enterprise",
+        "os_version": "22H2"
+      },
+      "id": "endpoint-unsupported-os-device-003",
+      "recommendation": "Plan OS upgrade or replacement before relying on the endpoint.",
+      "severity": "high",
+      "title": "Device is running an unsupported OS baseline for this demo"
+    },
+    {
+      "asset_id": "device-003",
+      "asset_type": "device",
+      "category": "endpoint",
+      "control_mapping": "Endpoint protection: least privilege",
+      "evidence": {
+        "expected_maximum": 1,
+        "hostname": "DEMO-WIN10-003",
+        "local_admin_count": 2
+      },
+      "id": "endpoint-local-admin-exposure-device-003",
+      "recommendation": "Remove unnecessary local administrator access.",
+      "severity": "high",
+      "title": "Endpoint has excessive local administrator exposure"
+    },
+    {
+      "asset_id": "device-002",
+      "asset_type": "device",
+      "category": "endpoint",
+      "control_mapping": "Endpoint protection: least privilege",
+      "evidence": {
+        "expected_maximum": 1,
+        "hostname": "DEMO-WIN11-002",
+        "local_admin_count": 4
+      },
+      "id": "endpoint-local-admin-exposure-device-002",
+      "recommendation": "Remove unnecessary local administrator access.",
+      "severity": "high",
+      "title": "Endpoint has excessive local administrator exposure"
+    },
+    {
+      "asset_id": "device-003",
+      "asset_type": "device",
+      "category": "endpoint",
+      "control_mapping": "Endpoint protection: disk encryption",
+      "evidence": {
+        "encryption_enabled": false,
+        "hostname": "DEMO-WIN10-003"
+      },
+      "id": "endpoint-encryption-disabled-device-003",
+      "recommendation": "Enable disk encryption or quarantine the device until remediated.",
+      "severity": "high",
+      "title": "Endpoint encryption is disabled"
+    },
+    {
+      "asset_id": "device-003",
+      "asset_type": "device",
+      "category": "compliance",
+      "control_mapping": "Compliance hygiene: patch visibility",
+      "evidence": {
+        "hostname": "DEMO-WIN10-003",
+        "patch_status": "missing"
+      },
+      "id": "compliance-patch-status-device-003",
+      "recommendation": "Confirm patch scan health and apply missing updates if needed.",
+      "severity": "high",
+      "title": "Endpoint patch status requires review"
+    },
+    {
+      "asset_id": "device-002",
+      "asset_type": "device",
+      "category": "compliance",
+      "control_mapping": "Compliance hygiene: endpoint policy enforcement",
+      "evidence": {
+        "compliance_state": "noncompliant",
+        "hostname": "DEMO-WIN11-002"
+      },
+      "id": "compliance-noncompliant-endpoint-device-002",
+      "recommendation": "Review failed policies and remediate before granting access.",
+      "severity": "high",
+      "title": "Endpoint is noncompliant"
+    },
+    {
+      "asset_id": "device-004",
+      "asset_type": "device",
+      "category": "imaging",
+      "control_mapping": "Endpoint lifecycle: imaging and provisioning quality",
+      "evidence": {
+        "hostname": "DEMO-WIN11-004",
+        "imaging_state": "in_progress"
+      },
+      "id": "imaging-incomplete-state-device-004",
+      "recommendation": "Review deployment logs and confirm provisioning completed.",
+      "severity": "medium",
+      "title": "Endpoint imaging state requires review"
+    },
+    {
+      "asset_id": "user-003",
+      "asset_type": "user",
+      "category": "identity",
+      "control_mapping": "Identity hygiene: stale account review",
+      "evidence": {
+        "days_since_login": 109,
+        "username": "taylor.morgan@example.example"
+      },
+      "id": "identity-stale-user-login-user-003",
+      "recommendation": "Review account need and disable it if unused.",
+      "severity": "medium",
+      "title": "User login is stale"
+    },
+    {
+      "asset_id": "device-003",
+      "asset_type": "device",
+      "category": "endpoint",
+      "control_mapping": "Endpoint hygiene: device inventory freshness",
+      "evidence": {
+        "days_since_checkin": 72,
+        "hostname": "DEMO-WIN10-003"
+      },
+      "id": "endpoint-stale-device-checkin-device-003",
+      "recommendation": "Confirm ownership, network reachability, and agent health.",
+      "severity": "medium",
+      "title": "Device check-in is stale"
+    },
+    {
+      "asset_id": "device-004",
+      "asset_type": "device",
+      "category": "compliance",
+      "control_mapping": "Compliance hygiene: patch visibility",
+      "evidence": {
+        "hostname": "DEMO-WIN11-004",
+        "patch_status": "unknown"
+      },
+      "id": "compliance-patch-status-device-004",
+      "recommendation": "Confirm patch scan health and apply missing updates if needed.",
+      "severity": "medium",
+      "title": "Endpoint patch status requires review"
+    }
+  ],
+  "generated_at": "2026-05-22T12:00:00Z",
+  "groups": [
+    {
+      "id": "group-001",
+      "member_user_ids": [
+        "user-001",
+        "user-003"
+      ],
+      "name": "Demo Endpoint Readers",
+      "privilege_level": "standard"
+    },
+    {
+      "id": "group-002",
+      "member_user_ids": [
+        "user-002"
+      ],
+      "name": "Demo Endpoint Administrators",
+      "privilege_level": "admin"
+    },
+    {
+      "id": "group-003",
+      "member_user_ids": [
+        "user-004"
+      ],
+      "name": "Demo Identity Break Glass Review",
+      "privilege_level": "tier0"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "failed-imaging",
+      "job_relevance": "Practices the SCCM/MECM-style thought process of checking deployment state, agent check-in, compliance, encryption, and patch readiness before closing a new laptop imaging ticket.",
+      "report": {
+        "affected_assets": [
+          "DEMO-WIN10-003"
+        ],
+        "findings": [
+          "HIGH imaging: Endpoint imaging state requires review \u2014 Review deployment logs and confirm provisioning completed.",
+          "HIGH endpoint: Device is running an unsupported OS baseline for this demo \u2014 Plan OS upgrade or replacement before relying on the endpoint.",
+          "HIGH endpoint: Endpoint has excessive local administrator exposure \u2014 Remove unnecessary local administrator access.",
+          "HIGH endpoint: Endpoint encryption is disabled \u2014 Enable disk encryption or quarantine the device until remediated.",
+          "HIGH compliance: Endpoint patch status requires review \u2014 Confirm patch scan health and apply missing updates if needed.",
+          "MEDIUM endpoint: Device check-in is stale \u2014 Confirm ownership, network reachability, and agent health."
+        ],
+        "job_relevance": "Practices the SCCM/MECM-style thought process of checking deployment state, agent check-in, compliance, encryption, and patch readiness before closing a new laptop imaging ticket.",
+        "scenario_id": "failed-imaging",
+        "technician_actions": [
+          "Confirm the device record exists in endpoint inventory or SCCM/MECM.",
+          "Review deployment logs for the failed imaging or task sequence state.",
+          "Confirm the endpoint checks in successfully after remediation.",
+          "Validate encryption, compliance, and patch visibility before handoff.",
+          "Update the ticket with findings, action taken, and verification evidence."
+        ],
+        "ticket": "User reports a newly imaged laptop is not ready for use.",
+        "title": "Failed imaging / endpoint provisioning triage",
+        "verification_steps": [
+          "Imaging state is complete or a reimage path is documented.",
+          "Device check-in is current and visible to endpoint tooling.",
+          "Encryption and compliance state are acceptable for user handoff."
+        ]
+      },
+      "title": "Failed imaging / endpoint provisioning triage"
+    },
+    {
+      "id": "disabled-user-device-assignment",
+      "job_relevance": "Practices Active Directory and endpoint lifecycle hygiene: disabled users should not keep active device ownership without review, reclaim, or reassignment.",
+      "report": {
+        "affected_assets": [
+          "taylor.morgan@example.example",
+          "DEMO-WIN10-003"
+        ],
+        "findings": [
+          "HIGH lifecycle: Disabled user still has assigned devices \u2014 Review offboarding and reclaim or reassign the user's devices.",
+          "MEDIUM identity: User login is stale \u2014 Review account need and disable it if unused."
+        ],
+        "job_relevance": "Practices Active Directory and endpoint lifecycle hygiene: disabled users should not keep active device ownership without review, reclaim, or reassignment.",
+        "scenario_id": "disabled-user-device-assignment",
+        "technician_actions": [
+          "Confirm the account is disabled and identify the assigned endpoint.",
+          "Check whether the device should be reclaimed, reassigned, or retired.",
+          "Remove stale ownership notes after manager or asset approval.",
+          "Document the offboarding cleanup in the ticket."
+        ],
+        "ticket": "Offboarding review finds a disabled user still assigned to a laptop.",
+        "title": "Disabled user still assigned to device",
+        "verification_steps": [
+          "Disabled user no longer owns active endpoint assignments without review.",
+          "Device ownership and asset lifecycle status are documented."
+        ]
+      },
+      "title": "Disabled user still assigned to device"
+    },
+    {
+      "id": "privileged-user-missing-mfa",
+      "job_relevance": "Practices identity administration escalation: privileged access should have MFA and group membership should be reviewed before access is trusted.",
+      "report": {
+        "affected_assets": [
+          "jamie.chen@example.example"
+        ],
+        "findings": [
+          "HIGH identity: Privileged user does not have MFA enabled \u2014 Require MFA for privileged endpoint or identity access."
+        ],
+        "job_relevance": "Practices identity administration escalation: privileged access should have MFA and group membership should be reviewed before access is trusted.",
+        "scenario_id": "privileged-user-missing-mfa",
+        "technician_actions": [
+          "Confirm privileged group membership and business need.",
+          "Escalate or enable MFA according to identity policy.",
+          "Review whether local or endpoint admin access is still required.",
+          "Document the identity hygiene remediation or exception."
+        ],
+        "ticket": "Identity review flags a privileged account without MFA enabled.",
+        "title": "Privileged identity missing MFA",
+        "verification_steps": [
+          "MFA is enabled or an approved exception is recorded.",
+          "Privileged group membership has a documented owner and purpose."
+        ]
+      },
+      "title": "Privileged identity missing MFA"
+    },
+    {
+      "id": "endpoint-compliance-queue",
+      "job_relevance": "Practices prioritizing endpoint support work by risk, evidence, and remediation steps instead of treating all device issues as equal.",
+      "report": {
+        "affected_assets": [
+          "DEMO-WIN10-003",
+          "DEMO-WIN11-002",
+          "DEMO-WIN11-004"
+        ],
+        "findings": [
+          "DEMO-WIN10-003: 6 findings, highest severity high",
+          "DEMO-WIN11-002: 2 findings, highest severity high",
+          "DEMO-WIN11-004: 2 findings, highest severity medium"
+        ],
+        "job_relevance": "Practices prioritizing endpoint support work by risk, evidence, and remediation steps instead of treating all device issues as equal.",
+        "scenario_id": "endpoint-compliance-queue",
+        "technician_actions": [
+          "Prioritize devices with the most findings and highest severity first.",
+          "Start with compliance blockers: encryption, patch visibility, and policy state.",
+          "Separate quick fixes from devices that need reimage, owner review, or escalation.",
+          "Record remediation evidence before closing endpoint tickets."
+        ],
+        "ticket": "Endpoint support queue needs a prioritized remediation plan.",
+        "title": "Endpoint compliance remediation queue",
+        "verification_steps": [
+          "Highest-risk devices have an owner, next action, and expected resolution path.",
+          "Compliance-impacting findings are remediated or escalated."
+        ]
+      },
+      "title": "Endpoint compliance remediation queue"
+    }
+  ],
+  "summary": {
+    "category_counts": {
+      "compliance": 3,
+      "endpoint": 5,
+      "identity": 2,
+      "imaging": 2,
+      "lifecycle": 1
+    },
+    "severity_counts": {
+      "high": 9,
+      "medium": 4
+    },
+    "total_devices": 4,
+    "total_findings": 13,
+    "total_groups": 3,
+    "total_users": 4
+  },
+  "top_risky_assets": [
+    {
+      "asset_id": "device-003",
+      "asset_type": "device",
+      "finding_count": 6,
+      "highest_severity": "high"
+    },
+    {
+      "asset_id": "user-003",
+      "asset_type": "user",
+      "finding_count": 2,
+      "highest_severity": "high"
+    },
+    {
+      "asset_id": "device-002",
+      "asset_type": "device",
+      "finding_count": 2,
+      "highest_severity": "high"
+    },
+    {
+      "asset_id": "device-004",
+      "asset_type": "device",
+      "finding_count": 2,
+      "highest_severity": "medium"
+    },
+    {
+      "asset_id": "user-002",
+      "asset_type": "user",
+      "finding_count": 1,
+      "highest_severity": "high"
+    }
+  ],
+  "users": [
+    {
+      "assigned_device_ids": [
+        "device-001"
+      ],
+      "department": "Demo Service Desk",
+      "display_name": "Alex Rivera Demo",
+      "enabled": true,
+      "id": "user-001",
+      "last_login_at": "2026-05-18T14:20:00Z",
+      "mfa_enabled": true,
+      "privileged_groups": [],
+      "username": "alex.rivera@example.example"
+    },
+    {
+      "assigned_device_ids": [
+        "device-002"
+      ],
+      "department": "Demo Endpoint Engineering",
+      "display_name": "Jamie Chen Demo",
+      "enabled": true,
+      "id": "user-002",
+      "last_login_at": "2026-05-12T09:45:00Z",
+      "mfa_enabled": false,
+      "privileged_groups": [
+        "group-002"
+      ],
+      "username": "jamie.chen@example.example"
+    },
+    {
+      "assigned_device_ids": [
+        "device-003"
+      ],
+      "department": "Demo Finance",
+      "display_name": "Taylor Morgan Demo",
+      "enabled": false,
+      "id": "user-003",
+      "last_login_at": "2026-02-01T17:30:00Z",
+      "mfa_enabled": true,
+      "privileged_groups": [],
+      "username": "taylor.morgan@example.example"
+    },
+    {
+      "assigned_device_ids": [
+        "device-004"
+      ],
+      "department": "Demo Identity Operations",
+      "display_name": "Casey Patel Demo",
+      "enabled": true,
+      "id": "user-004",
+      "last_login_at": "2026-05-20T11:05:00Z",
+      "mfa_enabled": true,
+      "privileged_groups": [
+        "group-003"
+      ],
+      "username": "casey.patel@example.example"
+    }
+  ]
+}
