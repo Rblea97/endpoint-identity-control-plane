@@ -37,20 +37,22 @@ Source: [`data-model.mmd`](diagrams/data-model.mmd). PNG fallback: [`data-model.
 1. A local client calls an endpoint such as `GET /risk-report`.
 2. The FastAPI route loads the committed synthetic inventory fixture.
 3. The loader rejects obvious secret-like fixture markers and validates the data with Pydantic models.
-4. The risk engine evaluates deterministic rules against users and devices.
-5. The route returns typed JSON containing findings, severity/category counts, and top risky assets.
+4. The risk engine evaluates deterministic rules against users, devices, vulnerabilities, and remediation tickets.
+5. The route returns typed JSON containing findings, severity/category counts, top risky assets, remediation queue items, and risk-reduction summary data.
 
 For static inventory endpoints such as `/users`, `/devices`, and `/groups`, the route returns validated synthetic records directly.
 
 ## Data model
 
-The MVP models three inventory areas:
+The MVP models five inventory areas:
 
 - **Users:** username, display name, department, enabled state, last login, MFA state, privileged groups, and assigned devices.
 - **Devices:** hostname, assigned user, OS, last check-in, patch status, encryption state, local admin count, compliance state, and imaging state.
 - **Groups:** name, privilege level, and member users.
+- **Vulnerability records:** synthetic endpoint vulnerability/patch-priority items with severity, status, patch availability, and recommended action.
+- **Remediation tickets:** synthetic technician tasks linked to users, devices, groups, and deterministic finding IDs.
 
-The `Inventory` model validates relationships so demo fixtures cannot quietly reference missing users, devices, or groups.
+The `Inventory` model validates relationships so demo fixtures cannot quietly reference missing users, devices, groups, vulnerability devices, or remediation assets.
 
 ## Trust boundaries
 
@@ -70,9 +72,10 @@ Validation, linting, type checking, and security scanning rely on the Python env
 
 - Read-only API endpoints for the current MVP.
 - Pydantic models with strict/frozen behavior for inventory and risk objects.
-- Cross-reference validation between users, devices, and groups.
+- Cross-reference validation between users, devices, groups, vulnerability records, and remediation tickets.
 - Synthetic-data classification in version and risk-report responses.
 - Deterministic timestamp for demo risk reports to keep tests and examples stable.
+- Deterministic endpoint, identity, vulnerability, remediation, and risk-reduction outputs.
 - Unit and API tests through FastAPI `TestClient`.
 - Local gates for Ruff, strict Ruff source checks, mypy, pytest, Gitleaks, Bandit, and pip-audit advisory output.
 

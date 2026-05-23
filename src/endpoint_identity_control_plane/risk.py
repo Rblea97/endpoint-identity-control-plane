@@ -8,10 +8,24 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from endpoint_identity_control_plane.models import Device, Inventory, User
+from endpoint_identity_control_plane.models import (
+    Device,
+    Inventory,
+    RemediationTicket,
+    User,
+    VulnerabilityRecord,
+)
 
 Severity = Literal["low", "medium", "high", "critical"]
-FindingCategory = Literal["identity", "endpoint", "compliance", "lifecycle", "imaging"]
+FindingCategory = Literal[
+    "identity",
+    "endpoint",
+    "compliance",
+    "lifecycle",
+    "imaging",
+    "vulnerability",
+    "remediation",
+]
 AssetType = Literal["user", "device", "group"]
 
 STALE_USER_DAYS = 60
@@ -46,6 +60,34 @@ class AssetRiskSummary(BaseModel):
     highest_severity: Severity
 
 
+class RemediationQueueItem(BaseModel):
+    """Prioritized remediation task for the dashboard."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    ticket_id: str = Field(min_length=1)
+    asset_type: AssetType
+    asset_id: str = Field(min_length=1)
+    title: str = Field(min_length=1)
+    status: Literal["open", "in_progress", "resolved"]
+    priority: Severity
+    age_days: int = Field(ge=0)
+    linked_finding_count: int = Field(ge=0)
+    technician_action: str = Field(min_length=1)
+    verification: str = Field(min_length=1)
+
+
+class RiskReductionSummary(BaseModel):
+    """Deterministic before/after risk-reduction summary for demo remediation."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    active_risk_points: int = Field(ge=0)
+    resolved_risk_points: int = Field(ge=0)
+    open_ticket_count: int = Field(ge=0)
+    resolved_ticket_count: int = Field(ge=0)
+
+
 class RiskReport(BaseModel):
     """Prioritized synthetic risk report."""
 
@@ -56,6 +98,8 @@ class RiskReport(BaseModel):
     finding_counts_by_severity: dict[Severity, int]
     finding_counts_by_category: dict[FindingCategory, int]
     top_risky_assets: list[AssetRiskSummary]
+    remediation_queue: list[RemediationQueueItem]
+    risk_reduction_summary: RiskReductionSummary
     findings: list[Finding]
 
 
@@ -68,6 +112,11 @@ def evaluate_inventory(inventory: Inventory, *, as_of: datetime) -> list[Finding
 
     for device in inventory.devices:
         findings.extend(_evaluate_device(device, as_of=as_of))
+
+    for vulnerability in inventory.vulnerability_records:
+        findings.extend(_evaluate_vulnerability(vulnerability, inventory))
+
+    findings.extend(_evaluate_privileged_owner_endpoint_correlation(inventory))
 
     return sorted(
         findings, key=lambda finding: (_severity_rank(finding.severity), finding.id), reverse=True
@@ -86,6 +135,8 @@ def build_risk_report(inventory: Inventory, *, as_of: datetime) -> RiskReport:
         finding_counts_by_severity=dict(severity_counts),
         finding_counts_by_category=dict(category_counts),
         top_risky_assets=_top_risky_assets(findings),
+        remediation_queue=_build_remediation_queue(inventory.remediation_tickets, as_of=as_of),
+        risk_reduction_summary=_build_risk_reduction_summary(inventory.remediation_tickets),
         findings=findings,
     )
 
@@ -274,6 +325,126 @@ def _evaluate_device(device: Device, *, as_of: datetime) -> list[Finding]:
         )
 
     return findings
+
+
+def _evaluate_vulnerability(
+    vulnerability: VulnerabilityRecord, inventory: Inventory
+) -> list[Finding]:
+    if vulnerability.status != "open":
+        return []
+
+    device = _device_by_id(inventory, vulnerability.device_id)
+    severity: Severity = vulnerability.severity
+    return [
+        Finding(
+            id=f"vulnerability-open-{vulnerability.id}",
+            severity=severity,
+            category="vulnerability",
+            title="Open endpoint vulnerability requires remediation",
+            asset_type="device",
+            asset_id=vulnerability.device_id,
+            evidence={
+                "hostname": device.hostname,
+                "vulnerability_id": vulnerability.id,
+                "vulnerability_title": vulnerability.title,
+                "cvss_score_x10": int(vulnerability.cvss_score * 10),
+                "patch_available": vulnerability.patch_available,
+            },
+            recommendation=vulnerability.recommended_action,
+            control_mapping="Vulnerability management: patch prioritization",
+        )
+    ]
+
+
+def _evaluate_privileged_owner_endpoint_correlation(inventory: Inventory) -> list[Finding]:
+    findings: list[Finding] = []
+    open_high_vulnerability_device_ids = {
+        vulnerability.device_id
+        for vulnerability in inventory.vulnerability_records
+        if vulnerability.status == "open" and vulnerability.severity in {"high", "critical"}
+    }
+
+    for device in inventory.devices:
+        owner = inventory.user_by_id(device.assigned_user_id)
+        if not owner.privileged_groups:
+            continue
+        has_high_vulnerability = device.id in open_high_vulnerability_device_ids
+        is_noncompliant = device.compliance_state == "noncompliant"
+        if not has_high_vulnerability and not is_noncompliant:
+            continue
+
+        findings.append(
+            Finding(
+                id=f"identity-endpoint-correlation-{device.id}-{owner.id}",
+                severity="critical",
+                category="identity",
+                title="Privileged identity owns a high-risk endpoint",
+                asset_type="device",
+                asset_id=device.id,
+                evidence={
+                    "hostname": device.hostname,
+                    "owner_username": owner.username,
+                    "privileged_group_count": len(owner.privileged_groups),
+                    "compliance_state": device.compliance_state,
+                    "has_open_high_vulnerability": device.id in open_high_vulnerability_device_ids,
+                },
+                recommendation=(
+                    "Prioritize endpoint remediation and privileged-owner review before trusting "
+                    "the device for sensitive administration."
+                ),
+                control_mapping="Identity and endpoint correlation: privileged access risk",
+            )
+        )
+
+    return findings
+
+
+def _device_by_id(inventory: Inventory, device_id: str) -> Device:
+    for device in inventory.devices:
+        if device.id == device_id:
+            return device
+    raise KeyError(device_id)
+
+
+def _build_remediation_queue(
+    tickets: list[RemediationTicket], *, as_of: datetime
+) -> list[RemediationQueueItem]:
+    queue = [
+        RemediationQueueItem(
+            ticket_id=ticket.id,
+            asset_type=ticket.asset_type,
+            asset_id=ticket.asset_id,
+            title=ticket.title,
+            status=ticket.status,
+            priority=ticket.priority,
+            age_days=max((as_of - ticket.opened_at).days, 0),
+            linked_finding_count=len(ticket.linked_finding_ids),
+            technician_action=ticket.technician_action,
+            verification=ticket.verification,
+        )
+        for ticket in tickets
+        if ticket.status != "resolved"
+    ]
+    return sorted(
+        queue,
+        key=lambda item: (_severity_rank(item.priority), item.age_days, item.ticket_id),
+        reverse=True,
+    )
+
+
+def _build_risk_reduction_summary(tickets: list[RemediationTicket]) -> RiskReductionSummary:
+    active_tickets = [ticket for ticket in tickets if ticket.status != "resolved"]
+    resolved_tickets = [ticket for ticket in tickets if ticket.status == "resolved"]
+    return RiskReductionSummary(
+        active_risk_points=sum(_ticket_risk_points(ticket) for ticket in active_tickets),
+        resolved_risk_points=sum(_ticket_risk_points(ticket) for ticket in resolved_tickets),
+        open_ticket_count=len(active_tickets),
+        resolved_ticket_count=len(resolved_tickets),
+    )
+
+
+def _ticket_risk_points(ticket: RemediationTicket) -> int:
+    return _severity_rank(ticket.priority) * max(len(ticket.linked_finding_ids), 1)
 
 
 def _top_risky_assets(findings: list[Finding]) -> list[AssetRiskSummary]:

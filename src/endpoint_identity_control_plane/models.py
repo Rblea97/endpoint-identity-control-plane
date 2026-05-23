@@ -11,6 +11,11 @@ ComplianceState = Literal["compliant", "noncompliant", "unknown"]
 ImagingState = Literal["complete", "in_progress", "failed", "unknown"]
 PatchStatus = Literal["current", "behind", "missing", "unknown"]
 PrivilegeLevel = Literal["standard", "admin", "tier0"]
+VulnerabilitySeverity = Literal["low", "medium", "high", "critical"]
+VulnerabilityStatus = Literal["open", "remediated", "accepted"]
+RemediationStatus = Literal["open", "in_progress", "resolved"]
+RemediationPriority = Literal["low", "medium", "high", "critical"]
+AssetType = Literal["user", "device", "group"]
 
 
 class StrictInventoryModel(BaseModel):
@@ -58,14 +63,46 @@ class Group(StrictInventoryModel):
     member_user_ids: list[str] = Field(default_factory=list)
 
 
+class VulnerabilityRecord(StrictInventoryModel):
+    """Synthetic endpoint vulnerability or patch-priority record."""
+
+    id: str = Field(min_length=1)
+    device_id: str = Field(min_length=1)
+    title: str = Field(min_length=1)
+    severity: VulnerabilitySeverity
+    cvss_score: float = Field(ge=0, le=10)
+    status: VulnerabilityStatus
+    discovered_at: datetime
+    patch_available: bool
+    recommended_action: str = Field(min_length=1)
+
+
+class RemediationTicket(StrictInventoryModel):
+    """Synthetic remediation task linked to endpoint or identity findings."""
+
+    id: str = Field(min_length=1)
+    asset_type: AssetType
+    asset_id: str = Field(min_length=1)
+    title: str = Field(min_length=1)
+    status: RemediationStatus
+    priority: RemediationPriority
+    opened_at: datetime
+    resolved_at: datetime | None = None
+    linked_finding_ids: list[str] = Field(default_factory=list)
+    technician_action: str = Field(min_length=1)
+    verification: str = Field(min_length=1)
+
+
 class Inventory(StrictInventoryModel):
-    """Validated synthetic users, devices, and groups."""
+    """Validated synthetic users, devices, groups, vulnerabilities, and remediation tasks."""
 
     data_classification: Literal["synthetic-demo-data-only"]
     source: Literal["committed-demo-fixture"]
     users: list[User]
     devices: list[Device]
     groups: list[Group]
+    vulnerability_records: list[VulnerabilityRecord] = Field(default_factory=list)
+    remediation_tickets: list[RemediationTicket] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def validate_relationships(self) -> Self:
@@ -123,6 +160,17 @@ class Inventory(StrictInventoryModel):
             if group.privilege_level in {"admin", "tier0"}:
                 self._validate_privileged_group_membership(group)
 
+        for vulnerability in self.vulnerability_records:
+            if vulnerability.device_id not in device_ids:
+                message = (
+                    f"vulnerability {vulnerability.id} device_id references unknown device: "
+                    f"{vulnerability.device_id}"
+                )
+                raise ValueError(message)
+
+        for ticket in self.remediation_tickets:
+            self._validate_remediation_ticket_asset(ticket, user_ids, device_ids, group_ids)
+
         return self
 
     def user_by_id(self, user_id: str) -> User:
@@ -154,3 +202,22 @@ class Inventory(StrictInventoryModel):
                     "but the user does not list that privileged group"
                 )
                 raise ValueError(message)
+
+    @staticmethod
+    def _validate_remediation_ticket_asset(
+        ticket: RemediationTicket,
+        user_ids: set[str],
+        device_ids: set[str],
+        group_ids: set[str],
+    ) -> None:
+        valid_ids = {
+            "user": user_ids,
+            "device": device_ids,
+            "group": group_ids,
+        }[ticket.asset_type]
+        if ticket.asset_id not in valid_ids:
+            message = (
+                f"remediation ticket {ticket.id} asset_id references unknown "
+                f"{ticket.asset_type}: {ticket.asset_id}"
+            )
+            raise ValueError(message)

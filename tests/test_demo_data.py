@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
@@ -8,6 +9,9 @@ from pydantic import ValidationError
 
 from endpoint_identity_control_plane.demo_data import DEMO_INVENTORY_PATH, load_demo_inventory
 from endpoint_identity_control_plane.models import Inventory
+from endpoint_identity_control_plane.risk import evaluate_inventory
+
+AS_OF = datetime(2026, 5, 22, 12, 0, tzinfo=UTC)
 
 
 def test_load_demo_inventory_returns_typed_synthetic_inventory() -> None:
@@ -27,6 +31,7 @@ def test_demo_inventory_relationships_are_consistent() -> None:
     user_ids = {user.id for user in inventory.users}
     device_ids = {device.id for device in inventory.devices}
     group_ids = {group.id for group in inventory.groups}
+    finding_ids = {finding.id for finding in evaluate_inventory(inventory, as_of=AS_OF)}
 
     for user in inventory.users:
         assert set(user.assigned_device_ids) <= device_ids
@@ -43,6 +48,38 @@ def test_demo_inventory_relationships_are_consistent() -> None:
             member = inventory.user_by_id(member_user_id)
             if group.privilege_level in {"admin", "tier0"}:
                 assert group.id in member.privileged_groups
+
+    for vulnerability in inventory.vulnerability_records:
+        assert vulnerability.device_id in device_ids
+
+    for ticket in inventory.remediation_tickets:
+        if ticket.asset_type == "user":
+            assert ticket.asset_id in user_ids
+        if ticket.asset_type == "device":
+            assert ticket.asset_id in device_ids
+        if ticket.asset_type == "group":
+            assert ticket.asset_id in group_ids
+        assert set(ticket.linked_finding_ids) <= finding_ids
+
+
+def test_open_remediation_tickets_link_active_risk_findings() -> None:
+    inventory = load_demo_inventory()
+    active_finding_ids = {finding.id for finding in evaluate_inventory(inventory, as_of=AS_OF)}
+
+    for ticket in inventory.remediation_tickets:
+        if ticket.status == "resolved":
+            continue
+        assert set(ticket.linked_finding_ids) & active_finding_ids
+
+
+def test_demo_inventory_includes_vulnerability_and_remediation_records() -> None:
+    inventory = load_demo_inventory()
+
+    assert len(inventory.vulnerability_records) >= 3
+    assert len(inventory.remediation_tickets) >= 3
+    assert any(vulnerability.status == "open" for vulnerability in inventory.vulnerability_records)
+    assert any(ticket.status == "resolved" for ticket in inventory.remediation_tickets)
+    assert any(ticket.linked_finding_ids for ticket in inventory.remediation_tickets)
 
 
 def test_demo_fixture_uses_fake_data_and_contains_no_secret_markers() -> None:
@@ -65,6 +102,22 @@ def test_inventory_rejects_unknown_device_assignment() -> None:
     data["users"][0]["assigned_device_ids"].append("device-missing")
 
     with pytest.raises(ValidationError, match="assigned_device_ids"):
+        Inventory.model_validate(data)
+
+
+def test_inventory_rejects_unknown_vulnerability_device_reference() -> None:
+    data = json.loads(DEMO_INVENTORY_PATH.read_text(encoding="utf-8"))
+    data["vulnerability_records"][0]["device_id"] = "device-missing"
+
+    with pytest.raises(ValidationError, match="vulnerability"):
+        Inventory.model_validate(data)
+
+
+def test_inventory_rejects_unknown_remediation_asset_reference() -> None:
+    data = json.loads(DEMO_INVENTORY_PATH.read_text(encoding="utf-8"))
+    data["remediation_tickets"][0]["asset_id"] = "device-missing"
+
+    with pytest.raises(ValidationError, match="remediation"):
         Inventory.model_validate(data)
 
 

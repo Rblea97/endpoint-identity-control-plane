@@ -58,7 +58,7 @@ def test_endpoint_compliance_queue_prioritizes_top_endpoint() -> None:
     report = build_scenario_report("endpoint-compliance-queue")
 
     assert report.affected_assets[0] == "DEMO-WIN10-003"
-    assert any("6 findings" in finding for finding in report.findings)
+    assert any("7 findings" in finding for finding in report.findings)
     assert any("prioritize" in action.lower() for action in report.technician_actions)
     assert any("compliance" in action.lower() for action in report.technician_actions)
 

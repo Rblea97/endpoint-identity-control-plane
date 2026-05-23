@@ -25,6 +25,13 @@ def test_static_demo_payload_contains_clickable_ui_data() -> None:
     assert any(device["hostname"] == "DEMO-WIN10-003" for device in payload["devices"])
     assert any(finding["asset_id"] == "device-003" for finding in payload["findings"])
     assert payload["summary"]["total_findings"] >= 10
+    assert payload["vulnerability_records"]
+    assert payload["patch_vulnerability_board"]
+    assert payload["patch_vulnerability_board"][0]["severity"] == "critical"
+    assert payload["remediation_queue"]
+    assert payload["remediation_queue"][0]["ticket_id"] == "ticket-001"
+    assert payload["risk_reduction_summary"]["open_ticket_count"] == 2
+    assert payload["risk_reduction_summary"]["resolved_ticket_count"] == 1
 
 
 def test_site_assets_exist_and_reference_demo_data() -> None:
@@ -36,6 +43,14 @@ def test_site_assets_exist_and_reference_demo_data() -> None:
     assert "demo-data.json" in app
     assert "failed-imaging" in app
     assert "endpoint-compliance-queue" in app
+    assert "owner-risk-list" in index
+    assert "patch-vulnerability-board" in index
+    assert "remediation-ticket-list" in index
+    assert "risk-reduction-summary" in index
+    assert "renderOwnerRisk" in app
+    assert "renderPatchVulnerabilityBoard" in app
+    assert "renderRemediationQueue" in app
+    assert "renderRiskReduction" in app
     assert "--accent" in styles
 
 

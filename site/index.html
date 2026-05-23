@@ -22,6 +22,8 @@
         <div class="brand-mark">EICP</div>
         <a href="#scenarios">Scenarios</a>
         <a href="#queue">Endpoint queue</a>
+        <a href="#owner-risk">Owner risk</a>
+        <a href="#remediation">Remediation</a>
         <a href="#findings">Findings</a>
       </nav>
       <section class="hero-grid">
@@ -78,6 +80,43 @@
           <div class="device-list" id="device-list"></div>
           <article class="device-detail" id="device-detail" aria-live="polite"></article>
         </div>
+      </section>
+
+      <section class="panel" id="owner-risk">
+        <div class="section-heading">
+          <p class="eyebrow">Identity owner view</p>
+          <h2>Risk by identity owner</h2>
+          <p>
+            Connect each endpoint to the synthetic user who owns it, then prioritize devices tied
+            to privileged access, compliance drift, or open vulnerabilities.
+          </p>
+        </div>
+        <div class="owner-risk-list" id="owner-risk-list"></div>
+      </section>
+
+      <section class="panel" id="patching">
+        <div class="section-heading">
+          <p class="eyebrow">Patch and vulnerability view</p>
+          <h2>Patch/vulnerability priority board</h2>
+          <p>
+            Sort synthetic vulnerabilities by severity, patch availability, owner sensitivity, and
+            remediation status.
+          </p>
+        </div>
+        <div class="patch-vulnerability-board" id="patch-vulnerability-board"></div>
+      </section>
+
+      <section class="panel" id="remediation">
+        <div class="section-heading">
+          <p class="eyebrow">Ticket-style workflow</p>
+          <h2>Remediation queue and risk reduction</h2>
+          <p>
+            Show how endpoint evidence becomes technician action, verification, and measurable
+            before/after risk reduction.
+          </p>
+        </div>
+        <div class="risk-reduction-summary" id="risk-reduction-summary"></div>
+        <div class="remediation-ticket-list" id="remediation-ticket-list"></div>
       </section>
 
       <section class="panel" id="findings">

@@ -14,6 +14,8 @@ from endpoint_identity_control_plane.operations_demo import (
 )
 from endpoint_identity_control_plane.risk import build_risk_report
 
+SEVERITY_ORDER = {"critical": 4, "high": 3, "medium": 2, "low": 1}
+
 ROOT = Path(__file__).resolve().parents[1]
 SITE_DIR = ROOT / "site"
 OUTPUT_PATH = SITE_DIR / "demo-data.json"
@@ -48,12 +50,58 @@ def build_static_demo_payload() -> dict[str, Any]:
         "users": [user.model_dump(mode="json") for user in inventory.users],
         "devices": [device.model_dump(mode="json") for device in inventory.devices],
         "groups": [group.model_dump(mode="json") for group in inventory.groups],
+        "vulnerability_records": [
+            vulnerability.model_dump(mode="json")
+            for vulnerability in inventory.vulnerability_records
+        ],
+        "patch_vulnerability_board": _build_patch_vulnerability_board(inventory),
+        "remediation_queue": [
+            item.model_dump(mode="json") for item in risk_report.remediation_queue
+        ],
+        "risk_reduction_summary": risk_report.risk_reduction_summary.model_dump(
+            mode="json"
+        ),
         "findings": [finding.model_dump(mode="json") for finding in risk_report.findings],
         "top_risky_assets": [
             asset.model_dump(mode="json") for asset in risk_report.top_risky_assets
         ],
         "scenarios": scenarios,
     }
+
+
+def _build_patch_vulnerability_board(inventory: Any) -> list[dict[str, Any]]:
+    users_by_id = {user.id: user for user in inventory.users}
+    devices_by_id = {device.id: device for device in inventory.devices}
+    board: list[dict[str, Any]] = []
+
+    for vulnerability in inventory.vulnerability_records:
+        device = devices_by_id[vulnerability.device_id]
+        owner = users_by_id[device.assigned_user_id]
+        board.append(
+            {
+                "vulnerability_id": vulnerability.id,
+                "device_id": device.id,
+                "hostname": device.hostname,
+                "owner_username": owner.username,
+                "owner_privileged": bool(owner.privileged_groups),
+                "title": vulnerability.title,
+                "severity": vulnerability.severity,
+                "status": vulnerability.status,
+                "patch_available": vulnerability.patch_available,
+                "recommended_action": vulnerability.recommended_action,
+            }
+        )
+
+    return sorted(
+        board,
+        key=lambda item: (
+            item["status"] == "open",
+            SEVERITY_ORDER[item["severity"]],
+            item["owner_privileged"],
+            item["vulnerability_id"],
+        ),
+        reverse=True,
+    )
 
 
 def export_static_demo(output_path: Path = OUTPUT_PATH) -> Path:

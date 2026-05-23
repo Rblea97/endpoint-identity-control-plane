@@ -57,6 +57,57 @@
   ],
   "findings": [
     {
+      "asset_id": "device-002",
+      "asset_type": "device",
+      "category": "vulnerability",
+      "control_mapping": "Vulnerability management: patch prioritization",
+      "evidence": {
+        "cvss_score_x10": 91,
+        "hostname": "DEMO-WIN11-002",
+        "patch_available": true,
+        "vulnerability_id": "vuln-001",
+        "vulnerability_title": "Critical browser security update missing on privileged endpoint"
+      },
+      "id": "vulnerability-open-vuln-001",
+      "recommendation": "Deploy the approved browser update, confirm endpoint check-in, and re-evaluate privileged access risk.",
+      "severity": "critical",
+      "title": "Open endpoint vulnerability requires remediation"
+    },
+    {
+      "asset_id": "device-002",
+      "asset_type": "device",
+      "category": "identity",
+      "control_mapping": "Identity and endpoint correlation: privileged access risk",
+      "evidence": {
+        "compliance_state": "noncompliant",
+        "has_open_high_vulnerability": true,
+        "hostname": "DEMO-WIN11-002",
+        "owner_username": "jamie.chen@example.example",
+        "privileged_group_count": 1
+      },
+      "id": "identity-endpoint-correlation-device-002-user-002",
+      "recommendation": "Prioritize endpoint remediation and privileged-owner review before trusting the device for sensitive administration.",
+      "severity": "critical",
+      "title": "Privileged identity owns a high-risk endpoint"
+    },
+    {
+      "asset_id": "device-003",
+      "asset_type": "device",
+      "category": "vulnerability",
+      "control_mapping": "Vulnerability management: patch prioritization",
+      "evidence": {
+        "cvss_score_x10": 82,
+        "hostname": "DEMO-WIN10-003",
+        "patch_available": true,
+        "vulnerability_id": "vuln-002",
+        "vulnerability_title": "Unsupported OS with missing endpoint protection update"
+      },
+      "id": "vulnerability-open-vuln-002",
+      "recommendation": "Reimage or replace the endpoint, then verify supported OS, patch, encryption, and compliance state.",
+      "severity": "high",
+      "title": "Open endpoint vulnerability requires remediation"
+    },
+    {
       "asset_id": "user-003",
       "asset_type": "user",
       "category": "lifecycle",
@@ -271,6 +322,88 @@
       "privilege_level": "tier0"
     }
   ],
+  "patch_vulnerability_board": [
+    {
+      "device_id": "device-002",
+      "hostname": "DEMO-WIN11-002",
+      "owner_privileged": true,
+      "owner_username": "jamie.chen@example.example",
+      "patch_available": true,
+      "recommended_action": "Deploy the approved browser update, confirm endpoint check-in, and re-evaluate privileged access risk.",
+      "severity": "critical",
+      "status": "open",
+      "title": "Critical browser security update missing on privileged endpoint",
+      "vulnerability_id": "vuln-001"
+    },
+    {
+      "device_id": "device-003",
+      "hostname": "DEMO-WIN10-003",
+      "owner_privileged": false,
+      "owner_username": "taylor.morgan@example.example",
+      "patch_available": true,
+      "recommended_action": "Reimage or replace the endpoint, then verify supported OS, patch, encryption, and compliance state.",
+      "severity": "high",
+      "status": "open",
+      "title": "Unsupported OS with missing endpoint protection update",
+      "vulnerability_id": "vuln-002"
+    },
+    {
+      "device_id": "device-002",
+      "hostname": "DEMO-WIN11-002",
+      "owner_privileged": true,
+      "owner_username": "jamie.chen@example.example",
+      "patch_available": true,
+      "recommended_action": "Keep local administrator membership at the approved demo baseline and document the verification result.",
+      "severity": "high",
+      "status": "remediated",
+      "title": "Local administrator exposure reduced after remediation",
+      "vulnerability_id": "vuln-004"
+    },
+    {
+      "device_id": "device-004",
+      "hostname": "DEMO-WIN11-004",
+      "owner_privileged": true,
+      "owner_username": "casey.patel@example.example",
+      "patch_available": false,
+      "recommended_action": "Monitor provisioning completion and verify the endpoint reports healthy state before user handoff.",
+      "severity": "medium",
+      "status": "accepted",
+      "title": "Endpoint health signal pending after provisioning",
+      "vulnerability_id": "vuln-003"
+    }
+  ],
+  "remediation_queue": [
+    {
+      "age_days": 2,
+      "asset_id": "device-002",
+      "asset_type": "device",
+      "linked_finding_count": 5,
+      "priority": "critical",
+      "status": "open",
+      "technician_action": "Deploy the approved update, remove unnecessary local administrators, and escalate MFA enforcement for the privileged owner.",
+      "ticket_id": "ticket-001",
+      "title": "Patch privileged endpoint and verify compliance",
+      "verification": "Endpoint checks in as compliant, vulnerability is closed, local administrator count returns to baseline, and privileged owner MFA is enabled."
+    },
+    {
+      "age_days": 3,
+      "asset_id": "device-003",
+      "asset_type": "device",
+      "linked_finding_count": 7,
+      "priority": "high",
+      "status": "in_progress",
+      "technician_action": "Reimage or retire the endpoint, clear stale ownership from the disabled user, and verify encryption plus check-in health.",
+      "ticket_id": "ticket-002",
+      "title": "Reimage stale Windows 10 endpoint and reclaim ownership",
+      "verification": "Device is either reassigned with a supported OS and current check-in or retired from active inventory."
+    }
+  ],
+  "risk_reduction_summary": {
+    "active_risk_points": 41,
+    "open_ticket_count": 2,
+    "resolved_risk_points": 3,
+    "resolved_ticket_count": 1
+  },
   "scenarios": [
     {
       "id": "failed-imaging",
@@ -280,6 +413,7 @@
           "DEMO-WIN10-003"
         ],
         "findings": [
+          "HIGH vulnerability: Open endpoint vulnerability requires remediation \u2014 Reimage or replace the endpoint, then verify supported OS, patch, encryption, and compliance state.",
           "HIGH imaging: Endpoint imaging state requires review \u2014 Review deployment logs and confirm provisioning completed.",
           "HIGH endpoint: Device is running an unsupported OS baseline for this demo \u2014 Plan OS upgrade or replacement before relying on the endpoint.",
           "HIGH endpoint: Endpoint has excessive local administrator exposure \u2014 Remove unnecessary local administrator access.",
@@ -372,8 +506,8 @@
           "DEMO-WIN11-004"
         ],
         "findings": [
-          "DEMO-WIN10-003: 6 findings, highest severity high",
-          "DEMO-WIN11-002: 2 findings, highest severity high",
+          "DEMO-WIN10-003: 7 findings, highest severity high",
+          "DEMO-WIN11-002: 4 findings, highest severity critical",
           "DEMO-WIN11-004: 2 findings, highest severity medium"
         ],
         "job_relevance": "Practices prioritizing endpoint support work by risk, evidence, and remediation steps instead of treating all device issues as equal.",
@@ -398,16 +532,18 @@
     "category_counts": {
       "compliance": 3,
       "endpoint": 5,
-      "identity": 2,
+      "identity": 3,
       "imaging": 2,
-      "lifecycle": 1
+      "lifecycle": 1,
+      "vulnerability": 2
     },
     "severity_counts": {
-      "high": 9,
+      "critical": 2,
+      "high": 10,
       "medium": 4
     },
     "total_devices": 4,
-    "total_findings": 13,
+    "total_findings": 16,
     "total_groups": 3,
     "total_users": 4
   },
@@ -415,18 +551,18 @@
     {
       "asset_id": "device-003",
       "asset_type": "device",
-      "finding_count": 6,
-      "highest_severity": "high"
-    },
-    {
-      "asset_id": "user-003",
-      "asset_type": "user",
-      "finding_count": 2,
+      "finding_count": 7,
       "highest_severity": "high"
     },
     {
       "asset_id": "device-002",
       "asset_type": "device",
+      "finding_count": 4,
+      "highest_severity": "critical"
+    },
+    {
+      "asset_id": "user-003",
+      "asset_type": "user",
       "finding_count": 2,
       "highest_severity": "high"
     },
@@ -499,6 +635,52 @@
         "group-003"
       ],
       "username": "casey.patel@example.example"
+    }
+  ],
+  "vulnerability_records": [
+    {
+      "cvss_score": 9.1,
+      "device_id": "device-002",
+      "discovered_at": "2026-05-20T10:15:00Z",
+      "id": "vuln-001",
+      "patch_available": true,
+      "recommended_action": "Deploy the approved browser update, confirm endpoint check-in, and re-evaluate privileged access risk.",
+      "severity": "critical",
+      "status": "open",
+      "title": "Critical browser security update missing on privileged endpoint"
+    },
+    {
+      "cvss_score": 8.2,
+      "device_id": "device-003",
+      "discovered_at": "2026-05-18T15:40:00Z",
+      "id": "vuln-002",
+      "patch_available": true,
+      "recommended_action": "Reimage or replace the endpoint, then verify supported OS, patch, encryption, and compliance state.",
+      "severity": "high",
+      "status": "open",
+      "title": "Unsupported OS with missing endpoint protection update"
+    },
+    {
+      "cvss_score": 5.8,
+      "device_id": "device-004",
+      "discovered_at": "2026-05-22T08:20:00Z",
+      "id": "vuln-003",
+      "patch_available": false,
+      "recommended_action": "Monitor provisioning completion and verify the endpoint reports healthy state before user handoff.",
+      "severity": "medium",
+      "status": "accepted",
+      "title": "Endpoint health signal pending after provisioning"
+    },
+    {
+      "cvss_score": 7.4,
+      "device_id": "device-002",
+      "discovered_at": "2026-05-19T12:00:00Z",
+      "id": "vuln-004",
+      "patch_available": true,
+      "recommended_action": "Keep local administrator membership at the approved demo baseline and document the verification result.",
+      "severity": "high",
+      "status": "remediated",
+      "title": "Local administrator exposure reduced after remediation"
     }
   ]
 }

@@ -22,6 +22,10 @@ async function boot() {
   renderScenarioDetail();
   renderDeviceQueue();
   renderDeviceDetail();
+  renderOwnerRisk();
+  renderPatchVulnerabilityBoard();
+  renderRemediationQueue();
+  renderRiskReduction();
   renderSeverityFilters();
   renderFindings();
 }
@@ -116,6 +120,72 @@ function renderDeviceDetail() {
     </div>
     <h3>Device findings</h3>
     ${renderList(findings.map((finding) => `${finding.severity.toUpperCase()} ${finding.category}: ${finding.title} — ${finding.recommendation}`))}
+  `;
+}
+
+function renderOwnerRisk() {
+  const target = document.querySelector('#owner-risk-list');
+  target.innerHTML = state.payload.users.map((user) => {
+    const devices = state.payload.devices.filter((device) => device.assigned_user_id === user.id);
+    const deviceIds = new Set(devices.map((device) => device.id));
+    const findings = state.payload.findings.filter((finding) => deviceIds.has(finding.asset_id) || finding.asset_id === user.id);
+    return `
+      <article class="insight-card">
+        <header>
+          <span class="category">${user.privileged_groups.length ? 'privileged owner' : 'standard owner'}</span>
+          <span class="severity ${findings.some((finding) => finding.severity === 'critical') ? 'critical' : 'medium'}">${findings.length} findings</span>
+        </header>
+        <h3>${escapeHtml(user.display_name)}</h3>
+        <p class="codeish">${escapeHtml(user.username)} · MFA ${user.mfa_enabled ? 'enabled' : 'missing'} · account ${user.enabled ? 'enabled' : 'disabled'}</p>
+        <p>${escapeHtml(devices.map((device) => `${device.hostname} (${device.compliance_state}, ${device.patch_status})`).join(' · '))}</p>
+      </article>
+    `;
+  }).join('');
+}
+
+function renderPatchVulnerabilityBoard() {
+  const target = document.querySelector('#patch-vulnerability-board');
+  target.innerHTML = state.payload.patch_vulnerability_board.map((item) => `
+    <article class="insight-card">
+      <header>
+        <span class="severity ${item.severity}">${escapeHtml(item.severity)}</span>
+        <span class="category">${escapeHtml(item.status)}</span>
+        ${item.owner_privileged ? '<span class="category">privileged owner</span>' : ''}
+      </header>
+      <h3>${escapeHtml(item.hostname)}</h3>
+      <p>${escapeHtml(item.title)}</p>
+      <p class="codeish">Owner: ${escapeHtml(item.owner_username)} · Patch available: ${item.patch_available ? 'yes' : 'no'}</p>
+      <p>${escapeHtml(item.recommended_action)}</p>
+    </article>
+  `).join('');
+}
+
+function renderRemediationQueue() {
+  const target = document.querySelector('#remediation-ticket-list');
+  target.innerHTML = state.payload.remediation_queue.map((ticket) => `
+    <article class="insight-card">
+      <header>
+        <span class="severity ${ticket.priority}">${escapeHtml(ticket.priority)}</span>
+        <span class="category">${escapeHtml(ticket.status)}</span>
+      </header>
+      <h3>${escapeHtml(ticket.title)}</h3>
+      <p class="codeish">${escapeHtml(ticket.ticket_id)} · ${escapeHtml(ticket.asset_type)} ${escapeHtml(ticket.asset_id)} · ${ticket.age_days} days open · ${ticket.linked_finding_count} linked findings</p>
+      <p><strong>Action:</strong> ${escapeHtml(ticket.technician_action)}</p>
+      <p><strong>Verify:</strong> ${escapeHtml(ticket.verification)}</p>
+    </article>
+  `).join('');
+}
+
+function renderRiskReduction() {
+  const summary = state.payload.risk_reduction_summary;
+  const target = document.querySelector('#risk-reduction-summary');
+  target.innerHTML = `
+    <div class="detail-grid">
+      <div class="detail-box"><span>Active risk points</span><strong>${summary.active_risk_points}</strong></div>
+      <div class="detail-box"><span>Resolved risk points</span><strong>${summary.resolved_risk_points}</strong></div>
+      <div class="detail-box"><span>Open remediation tickets</span><strong>${summary.open_ticket_count}</strong></div>
+      <div class="detail-box"><span>Resolved remediation tickets</span><strong>${summary.resolved_ticket_count}</strong></div>
+    </div>
   `;
 }
 

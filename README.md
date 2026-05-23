@@ -50,6 +50,14 @@ Scenario docs live in `docs/demo-scenarios/`.
 
 The repository also includes a static browser UI under `site/`. It can run locally now and can be deployed to GitHub Pages after explicit approval.
 
+The dashboard now highlights:
+
+- risky endpoints ranked by deterministic findings;
+- identity-owner context for assigned devices, MFA state, disabled/stale accounts, and privileged-group ownership;
+- patch/vulnerability priority using synthetic vulnerability records;
+- ticket-style remediation tasks with action and verification notes;
+- before/after risk-reduction summary for resolved versus open remediation work.
+
 Local preview:
 
 ```bash
@@ -123,7 +131,7 @@ Shortened example response:
 - `GET /devices` — synthetic endpoint records.
 - `GET /groups` — synthetic group records.
 - `GET /findings` — deterministic endpoint and identity findings.
-- `GET /risk-report` — summarized risk report with counts and top risky assets.
+- `GET /risk-report` — summarized risk report with counts, top risky assets, remediation queue, and risk-reduction summary.
 
 See `docs/api.md` for endpoint examples and response notes.
 
@@ -140,7 +148,10 @@ The v1 rule engine flags conditions such as:
 - excessive local administrator exposure;
 - noncompliant endpoint state;
 - failed or in-progress imaging state;
-- missing or unknown patch status.
+- missing or unknown patch status;
+- open synthetic vulnerability records requiring remediation;
+- privileged identity ownership of a high-risk endpoint;
+- open remediation tickets and resolved-ticket risk reduction.
 
 The rule engine is deterministic on purpose. It is easier to test, explain, and review than an ML/LLM-based scoring system for this stage of the project.
 

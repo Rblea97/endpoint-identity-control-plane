@@ -63,6 +63,47 @@ def test_risk_report_identifies_top_risky_assets() -> None:
     assert top_asset.highest_severity == "high"
 
 
+def test_open_vulnerabilities_create_deterministic_findings() -> None:
+    inventory = load_demo_inventory()
+    findings = evaluate_inventory(inventory, as_of=AS_OF)
+    finding_ids = {finding.id for finding in findings}
+
+    assert "vulnerability-open-vuln-001" in finding_ids
+    assert "vulnerability-open-vuln-002" in finding_ids
+    assert "vulnerability-open-vuln-004" not in finding_ids
+
+
+def test_privileged_owner_endpoint_risk_is_correlated() -> None:
+    inventory = load_demo_inventory()
+    findings = evaluate_inventory(inventory, as_of=AS_OF)
+    correlated = next(
+        finding
+        for finding in findings
+        if finding.id == "identity-endpoint-correlation-device-002-user-002"
+    )
+
+    assert correlated.severity == "critical"
+    assert correlated.asset_type == "device"
+    assert correlated.asset_id == "device-002"
+    assert correlated.evidence["owner_username"] == "jamie.chen@example.example"
+    assert correlated.evidence["privileged_group_count"] == 1
+
+
+def test_risk_report_includes_remediation_queue_and_risk_reduction() -> None:
+    inventory = load_demo_inventory()
+    report = build_risk_report(inventory, as_of=AS_OF)
+
+    assert report.remediation_queue
+    assert report.remediation_queue[0].ticket_id == "ticket-001"
+    assert report.remediation_queue[0].priority == "critical"
+    assert report.risk_reduction_summary.open_ticket_count == 2
+    assert report.risk_reduction_summary.resolved_ticket_count == 1
+    assert (
+        report.risk_reduction_summary.active_risk_points
+        > report.risk_reduction_summary.resolved_risk_points
+    )
+
+
 def test_risk_evaluation_is_deterministic_for_same_as_of() -> None:
     inventory = load_demo_inventory()
 
