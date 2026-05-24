@@ -40,6 +40,7 @@ def test_site_assets_exist_and_reference_demo_data() -> None:
     styles = (SITE / "styles.css").read_text(encoding="utf-8")
 
     assert "Endpoint Identity Control Plane" in index
+    assert "https://rblea97.github.io/endpoint-identity-control-plane/" in index
     assert "demo-data.json" in app
     assert "failed-imaging" in app
     assert "endpoint-compliance-queue" in app

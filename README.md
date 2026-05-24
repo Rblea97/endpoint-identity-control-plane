@@ -2,7 +2,10 @@
 
 A local FastAPI lab that models endpoint and identity risk using synthetic Windows/identity inventory data.
 
-**Status:** Portfolio/demo project for local review. It uses fake data only and does not connect to real Microsoft tenants, Active Directory, SCCM/MECM, Intune, Entra ID, Defender, or employer systems.
+**Live demo:** <https://rblea97.github.io/endpoint-identity-control-plane/>  
+**Repo status:** Portfolio/demo project using fake data only. It does not connect to real Microsoft tenants, Active Directory, SCCM/MECM, Intune, Entra ID, Defender, or employer systems.
+
+If this repository is still private, GitHub may require sign-in to view the Pages site. Once the repo is public, the demo link opens directly with no install, no terminal, and no cloud account.
 
 ## Overview
 
@@ -16,6 +19,13 @@ The data classification for all committed examples and API responses is:
 synthetic-demo-data-only
 ```
 
+## Tech stack
+
+- Python 3.12, FastAPI, Pydantic, pytest, mypy, Ruff.
+- Static HTML/CSS/JavaScript dashboard deployed with GitHub Pages.
+- Security checks with Gitleaks, Bandit, pip-audit, and CI validation.
+- Synthetic JSON fixtures only — no real tenant, employer, endpoint, or identity data.
+
 ## What it demonstrates
 
 - Endpoint inventory concepts: hostname, OS baseline, patch status, encryption, local admin exposure, compliance state, imaging state, and check-in freshness.
@@ -24,6 +34,29 @@ synthetic-demo-data-only
 - Deterministic risk scoring with evidence, severity, category, remediation guidance, and control mappings.
 - FastAPI service design with typed response models and generated OpenAPI docs.
 - Public-safe software discipline: synthetic fixtures, tests, type checking, linting, security scans, ADRs, threat model, and validation checklists.
+
+## 30-second browser demo
+
+Recruiters and reviewers should not need a terminal to see the project. Start here:
+
+**Open the live dashboard:** <https://rblea97.github.io/endpoint-identity-control-plane/>
+
+What to click:
+
+1. **Start the demo** — choose an IT ticket scenario.
+2. **Endpoint queue** — inspect the riskiest synthetic devices.
+3. **Owner risk** — connect endpoint risk to privileged/stale/disabled identity context.
+4. **Remediation** — see ticket-style actions and risk-reduction impact.
+
+The dashboard highlights:
+
+- risky endpoints ranked by deterministic findings;
+- identity-owner context for assigned devices, MFA state, disabled/stale accounts, and privileged-group ownership;
+- patch/vulnerability priority using synthetic vulnerability records;
+- ticket-style remediation tasks with action and verification notes;
+- before/after risk-reduction summary for resolved versus open remediation work.
+
+No login, tenant, VM, SCCM lab, or command prompt is required for the static demo once GitHub Pages is available.
 
 ## 5-minute actionable IT demo
 
@@ -46,19 +79,9 @@ The CLI prints ticket-style walkthroughs with affected assets, findings, technic
 
 Scenario docs live in `docs/demo-scenarios/`.
 
-## Clickable browser demo
+## Local developer preview
 
-The repository also includes a static browser UI under `site/`. It can run locally now and can be deployed to GitHub Pages after explicit approval.
-
-The dashboard now highlights:
-
-- risky endpoints ranked by deterministic findings;
-- identity-owner context for assigned devices, MFA state, disabled/stale accounts, and privileged-group ownership;
-- patch/vulnerability priority using synthetic vulnerability records;
-- ticket-style remediation tasks with action and verification notes;
-- before/after risk-reduction summary for resolved versus open remediation work.
-
-Local preview:
+The static dashboard source lives under `site/`. Developers can preview it locally when changing the payload or UI:
 
 ```bash
 python scripts/export_static_demo.py
@@ -67,7 +90,7 @@ python -m http.server 4173 --directory site
 
 Then open <http://127.0.0.1:4173/>.
 
-The prepared GitHub Pages workflow is manual-only (`workflow_dispatch`) so the site is not deployed just because code is merged. Public deployment should happen only after final review.
+GitHub Pages deploys the committed `site/` directory automatically after changes to the dashboard, static payload, or Pages workflow land on `main`.
 
 ## Quick start
 
